@@ -41,7 +41,7 @@ static QString resourceRoot;
 bool processResourceFile(const QStringList &filenamesIn, const QString &filenameOut, bool list)
 {
     if (verbose)
-        fprintf(stderr, "PyQt4 resource compiler\n");
+        fprintf(stderr, "PySide resource compiler\n");
 
     //setup
     RCCResourceLibrary library;
@@ -87,7 +87,7 @@ bool processResourceFile(const QStringList &filenamesIn, const QString &filename
 
 int showHelp(const char *argv0, const QString &error)
 {
-    fprintf(stderr, "PyQt resource compiler\n");
+    fprintf(stderr, "PySide resource compiler\n");
     if (!error.isEmpty())
         fprintf(stderr, "%s: %s\n", argv0, error.toLatin1().constData());
     fprintf(stderr, "Usage: %s  [options] <inputs>\n\n"

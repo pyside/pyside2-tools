@@ -400,11 +400,11 @@ RCCResourceLibrary::writeHeader(FILE *out)
     fprintf(out, "# Resource object code\n");
     fprintf(out, "#\n");
     fprintf(out, "# Created: %s\n", QDateTime::currentDateTime().toString().toLatin1().constData());
-    fprintf(out, "#      by: The Resource Compiler for PyQt (Qt v%s)\n", QT_VERSION_STR);
+    fprintf(out, "#      by: The Resource Compiler for PySide (Qt v%s)\n", QT_VERSION_STR);
     fprintf(out, "#\n");
     fprintf(out, "# WARNING! All changes made in this file will be lost!\n");
     fprintf(out, "\n");
-    fprintf(out, "from PyQt4 import QtCore\n\n");
+    fprintf(out, "from PySide import QtCore\n\n");
 
     return true;
 }
