@@ -40,7 +40,7 @@ def generateUi(uifname, pyfname, execute, indent):
     return 0
 
 
-optparser = optparse.OptionParser(usage="pyuic4 [options] <ui-file>",
+optparser = optparse.OptionParser(usage="pyside-uic [options] <ui-file>",
                                   version=Version)
 optparser.add_option("-o", "--output", dest="output",
                      default="-", metavar="FILE",

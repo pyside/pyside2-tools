@@ -26,7 +26,7 @@ setup(name='PySideUiC',
       author='PySide team',
       author_email='contact@pyside.org',
       url='http://www.pyside.org',
-      scripts=['pyuic.py'],
+      scripts=['pyside-uic'],
       packages=['pysideuic', 'pysideuic.Compiler', 'pysideuic.elementtree'],
       package_data={'pysideuic' : ['widget-plugins/*']})
 
