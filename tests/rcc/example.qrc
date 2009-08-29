@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>words.txt</file>
+    <file alias="jack">shining.txt</file>
+</qresource>
+</RCC>
