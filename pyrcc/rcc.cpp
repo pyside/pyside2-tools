@@ -1,6 +1,9 @@
 /****************************************************************************
 **
 ** Copyright (C) 1992-2005 Trolltech AS. All rights reserved.
+** Copyright (C) 2009 Nokia Corporation and/or its subsidiary(ies)
+**
+** Contact: PySide team <contact@pyside.org>
 **
 ** This file is part of the tools applications of the Qt Toolkit.
 **
