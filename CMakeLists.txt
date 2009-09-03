@@ -1,15 +1,15 @@
 
 cmake_minimum_required(VERSION 2.6)
-project(PYSIDE-TOOLS)
+project(pyside-tools)
 
 find_package(PythonInterp REQUIRED)
 find_package(Qt4 4.5.0 REQUIRED)
 
 enable_testing()
 
-add_subdirectory(pyrcc)
-add_subdirectory(tests)
-
+set(pyside_tools_MAJOR_VERSION "0")
+set(pyside_tools_MINOR_VERSION "1")
+set(pyside_tools_VERSION "${pyside_tools_MAJOR_VERSION}.${pyside_tools_MINOR_VERSION}")
 
 # UIC stuff
 execute_process(
@@ -33,3 +33,13 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake"
 
 add_custom_target(uninstall "${CMAKE_COMMAND}"
                   -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+
+set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${pyside_tools_VERSION})
+add_custom_target(dist
+    COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD
+        | bzip2 > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.bz2
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+add_subdirectory(pyrcc)
+add_subdirectory(tests)
+
