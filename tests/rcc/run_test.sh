@@ -7,7 +7,7 @@
 # $2: python test
 # $3: qrc file
 
-export PYTHONPATH=$PYTHON_PATH:`pwd`
+export PYTHONPATH=$PYTHONPATH:`pwd`
 pyside-rcc4 -o `basename $3 .qrc`_rc.py $3
 cd $4
 $1 $2
