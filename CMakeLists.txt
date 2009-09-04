@@ -9,7 +9,8 @@ enable_testing()
 
 set(pyside_tools_MAJOR_VERSION "0")
 set(pyside_tools_MINOR_VERSION "1")
-set(pyside_tools_VERSION "${pyside_tools_MAJOR_VERSION}.${pyside_tools_MINOR_VERSION}")
+set(pyside_tools_MICRO_VERSION "1")
+set(pyside_tools_VERSION "${pyside_tools_MAJOR_VERSION}.${pyside_tools_MINOR_VERSION}.${pyside_tools_MICRO_VERSION}")
 
 # UIC stuff
 execute_process(
