@@ -3,6 +3,7 @@ add_executable(pyside-rcc4 main.cpp rcc.cpp)
 include_directories(pyside-rcc4
                     ${QT_INCLUDE_DIR}
                     ${QT_QT_INCLUDE_DIR}
+                    ${QT_QTXML_INCLUDE_DIR}
                     ${QT_QTCORE_INCLUDE_DIR})
 
 target_link_libraries(pyside-rcc4
