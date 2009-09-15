@@ -5,7 +5,7 @@
  * Copyright (C) 2002-2007 Detlev Offenbach <detlev@die-offenbachs.de>
  * Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
  *
- * Contact: PySide team <contact@pyside.org>
+ * Contact: PySide team <pyside@openbossa.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

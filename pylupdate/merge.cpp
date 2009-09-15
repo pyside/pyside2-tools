@@ -4,7 +4,7 @@
  * Copyright (C) 1992-2006 Trolltech AS. All rights reserved.
  * Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
  *
- * Contact: PySide team <contact@pyside.org>
+ * Contact: PySide team <pyside@openbossa.org>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
