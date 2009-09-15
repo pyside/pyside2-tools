@@ -1,5 +1,5 @@
 /*
- * This file is part of the API Extractor project.
+ * This file is part of the PySide Tools project.
  *
  * Copyright (C) 1992-2005 Trolltech AS. All rights reserved.
  * Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
