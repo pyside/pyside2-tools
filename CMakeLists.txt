@@ -47,5 +47,6 @@ add_custom_target(dist
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_subdirectory(pyrcc)
+add_subdirectory(pylupdate)
 add_subdirectory(tests)
 
