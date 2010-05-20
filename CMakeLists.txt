@@ -12,6 +12,8 @@ set(pyside_tools_MINOR_VERSION "1")
 set(pyside_tools_MICRO_VERSION "3")
 set(pyside_tools_VERSION "${pyside_tools_MAJOR_VERSION}.${pyside_tools_MINOR_VERSION}.${pyside_tools_MICRO_VERSION}")
 
+configure_file(pyside-uic.in pyside-uic @ONLY)
+
 # UIC stuff
 execute_process(
     COMMAND ${PYTHON_EXECUTABLE} -c "from distutils import sysconfig; \\
@@ -20,9 +22,9 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 if (NOT SITE_PACKAGE)
     message(FATAL_ERROR "Could not detect Python module installation directory.")
-endif (NOT SITE_PACKAGE)
+endif()
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/pyside-uic
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pyside-uic
         DESTINATION bin
         PERMISSIONS
         OWNER_EXECUTE OWNER_WRITE OWNER_READ
