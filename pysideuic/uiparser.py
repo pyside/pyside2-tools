@@ -368,9 +368,9 @@ class UIParser(object):
                 icon = self.wprops.getProperty(elem, "icon")
 
                 if icon:
-                    w.addItem(icon, QtCore.QString())
+                    w.addItem(icon, "")
                 else:
-                    w.addItem(QtCore.QString())
+                    w.addItem("")
 
                 w.setItemText(self.item_nr, text)
 
