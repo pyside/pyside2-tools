@@ -309,7 +309,7 @@ class Properties(object):
     # These properties will be set with a widget.setProperty call rather than
     # calling the set<property> function.
     def _setViaSetProperty(self, widget, prop):
-        widget.setProperty(prop.attrib["name"], QtCore.QVariant(self.convert(prop)))
+        widget.setProperty(prop.attrib["name"], self.convert(prop))
 
     # Ignore the property.
     def _ignore(self, widget, prop):
