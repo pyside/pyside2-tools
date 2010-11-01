@@ -4,7 +4,7 @@ project(pyside-tools)
 
 find_package(PythonInterp REQUIRED)
 find_package(Qt4 4.5.0 REQUIRED)
-find_package(PySide 0.4.0 REQUIRED)
+find_package(PySide 1.0.0 REQUIRED)
 
 enable_testing()
 
