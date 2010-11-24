@@ -29,13 +29,7 @@ from itertools import count
 try:
     from xml.etree.cElementTree import parse, SubElement
 except ImportError:
-    try:
-        from cElementTree import parse, SubElement
-    except ImportError:
-        try:
-            from elementtree.ElementTree import parse, SubElement
-        except ImportError:
-            from pysideuic.elementtree.ElementTree import parse, SubElement
+    from xml.etree.ElementTree import parse, SubElement
 
 
 from exceptions import NoSuchWidgetError
