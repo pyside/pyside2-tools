@@ -166,7 +166,8 @@ class UIParser(object):
 
         parent = self.stack.topwidget
         if isinstance(parent, (QtGui.QToolBox, QtGui.QTabWidget,
-                               QtGui.QStackedWidget, QtGui.QDockWidget)):
+                               QtGui.QStackedWidget, QtGui.QDockWidget,
+                               QtGui.QWizard)):
             parent = None
 
 
@@ -219,6 +220,9 @@ class UIParser(object):
             tooltip = self.wprops.getAttribute(elem, "toolTip")
             if tooltip is not None:
                 topwidget.setTabToolTip(topwidget.indexOf(widget), tooltip)
+
+        elif isinstance(topwidget, QtGui.QWizard):
+            topwidget.addPage(widget)
 
         elif isinstance(topwidget, QtGui.QStackedWidget):
             topwidget.addWidget(widget)

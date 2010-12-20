@@ -270,7 +270,7 @@ _qwidgets = (
     "QScrollArea", "QScrollBar", "QSlider", "QSpinBox", "QSplitter",
     "QStackedWidget", "QStatusBar",
     "QTableView", "QTextBrowser", "QTextEdit", "QTimeEdit", "QToolBar",
-    "QToolButton", "QTreeView")
+    "QToolButton", "QTreeView", "QWizard", "QWizardPage")
 
 class QtGui(ProxyNamespace):
     class QApplication(QtCore.QObject):
@@ -378,6 +378,8 @@ class QtGui(ProxyNamespace):
 
     class QComboBox(QWidget): pass
     class QFontComboBox(QComboBox): pass
+    class QDialog(QWidget): pass
+    class QWizard(QDialog): pass
 
     # Add all remaining classes.
     for _class in _qwidgets:
