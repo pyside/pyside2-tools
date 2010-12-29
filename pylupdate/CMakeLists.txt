@@ -29,3 +29,10 @@ target_link_libraries(pyside-lupdate
                       ${QT_QTGUI_LIBRARY})
 
 install(TARGETS pyside-lupdate RUNTIME DESTINATION bin)
+
+# Man pages
+if (NOT win32)
+    file(GLOB manpages "${CMAKE_CURRENT_SOURCE_DIR}/*.1")
+    install(FILES ${manpages} DESTINATION share/man/man1)
+endif()
+
