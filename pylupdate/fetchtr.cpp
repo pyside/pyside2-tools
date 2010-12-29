@@ -590,7 +590,7 @@ static void parse( MetaTranslator *tor, const char *initialContext,
 
                     if (!text.isEmpty())
                     {
-                        tor->insert(MetaTranslatorMessage(context, text, com, 
+                        tor->insert(MetaTranslatorMessage(context, text, com,
                                 yyFileName, yyLineNo,
                                 QStringList(), utf8,
                                 MetaTranslatorMessage::Unfinished, plural));
@@ -638,7 +638,7 @@ static void parse( MetaTranslator *tor, const char *initialContext,
                     }
                     if (!text.isEmpty())
                     {
-                        tor->insert( MetaTranslatorMessage(context, text, com, 
+                        tor->insert( MetaTranslatorMessage(context, text, com,
                                                         yyFileName, yyLineNo,
                                                         QStringList(), utf8,
                                                         MetaTranslatorMessage::Unfinished,
@@ -668,7 +668,7 @@ static void parse( MetaTranslator *tor, const char *initialContext,
                         tor->insert( MetaTranslatorMessage(context, "", com,
                                                         yyFileName, yyLineNo,
                                                         QStringList(), false) );
-    
+
                     }
                 }
                 yyTok = getToken();
@@ -692,7 +692,7 @@ void fetchtr_py( const char *fileName, MetaTranslator *tor,
             char buf[100];
             strerror_s(buf, sizeof(buf), errno);
             fprintf( stderr,
-                     "pylupdate4 error: Cannot open Python source file '%s': %s\n",
+                     "pyside-lupdate error: Cannot open Python source file '%s': %s\n",
                      fileName, buf );
         }
 #else
@@ -700,7 +700,7 @@ void fetchtr_py( const char *fileName, MetaTranslator *tor,
     if ( yyInFile == 0 ) {
         if ( mustExist )
             fprintf( stderr,
-                     "pylupdate4 error: Cannot open Python source file '%s': %s\n",
+                     "pyside-lupdate error: Cannot open Python source file '%s': %s\n",
                      fileName, strerror(errno) );
 #endif
         return;
@@ -823,10 +823,10 @@ void fetchtr_ui( const char *fileName, MetaTranslator *tor,
 #if defined(_MSC_VER) && _MSC_VER >= 1400
             char buf[100];
             strerror_s(buf, sizeof(buf), errno);
-            fprintf( stderr, "pylupdate4 error: cannot open UI file '%s': %s\n",
+            fprintf( stderr, "pyside-lupdate error: cannot open UI file '%s': %s\n",
                      fileName, buf );
 #else
-            fprintf( stderr, "pylupdate4 error: cannot open UI file '%s': %s\n",
+            fprintf( stderr, "pyside-lupdate error: cannot open UI file '%s': %s\n",
                      fileName, strerror(errno) );
 #endif
         }
