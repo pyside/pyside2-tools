@@ -23,6 +23,7 @@
 import logging
 import operator
 import string
+import re
 
 from pysideuic.exceptions import UnsupportedPropertyError
 
@@ -102,9 +103,12 @@ class Properties(object):
     def _stringlist(self, prop):
         return [self._string(p) for p in prop]
 
+    esc_regex = re.compile(r"(\"|\'|\\)")
+
     def _string(self, prop):
         if prop.get("notr", None) == "true":
-            return self._cstring(prop)
+            x = Properties.esc_regex.sub(r"\\\1", prop.text)
+            return '"%s"' % re.sub(r"\n", r'\\n"\n"', x)
 
         if prop.text is None:
             return ""
