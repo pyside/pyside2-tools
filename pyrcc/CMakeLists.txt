@@ -11,3 +11,10 @@ target_link_libraries(pyside-rcc
                       ${QT_QTXML_LIBRARY})
 
 install(TARGETS pyside-rcc RUNTIME DESTINATION bin)
+
+# Man pages
+if (NOT win32)
+    file(GLOB manpages "${CMAKE_CURRENT_SOURCE_DIR}/*.1")
+    install(FILES ${manpages} DESTINATION share/man/man1)
+endif()
+
