@@ -36,6 +36,12 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pyside-uic
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pysideuic
         DESTINATION ${SITE_PACKAGE})
 
+# Man pages for pyside-uic
+if (NOT win32)
+    file(GLOB manpages "${CMAKE_CURRENT_SOURCE_DIR}/pysideuic/*.1")
+    install(FILES ${manpages} DESTINATION share/man/man1)
+endif()
+
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake"
                "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
                IMMEDIATE @ONLY)
