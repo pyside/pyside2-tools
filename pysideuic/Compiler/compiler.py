@@ -1,7 +1,7 @@
 # This file is part of the PySide project.
 #
-# Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
-# Copyright (C) 2009 Riverbank Computing Limited.
+# Copyright (C) 2009-2011 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (C) 2010 Riverbank Computing Limited.
 # Copyright (C) 2009 Torsten Marek
 #
 # Contact: PySide team <pyside@openbossa.org>
@@ -23,22 +23,22 @@
 import sys
 
 from pysideuic.properties import Properties
-from qobjectcreator import CompilerCreatorPolicy
-import qtproxies
+from pysideuic.uiparser import UIParser
+from pysideuic.Compiler import qtproxies
+from pysideuic.Compiler.indenter import createCodeIndenter, getIndenter, \
+        write_code
+from pysideuic.Compiler.qobjectcreator import CompilerCreatorPolicy
+from pysideuic.Compiler.misc import write_import
 
-from indenter import createCodeIndenter, getIndenter, write_code
 
-from pysideuic import uiparser
-
-
-class UICompiler(uiparser.UIParser):
+class UICompiler(UIParser):
     def __init__(self):
-        uiparser.UIParser.__init__(self, qtproxies.QtCore, qtproxies.QtGui,
+        UIParser.__init__(self, qtproxies.QtCore, qtproxies.QtGui,
                 CompilerCreatorPolicy())
 
     def reset(self):
         qtproxies.i18n_strings = []
-        uiparser.UIParser.reset(self)
+        UIParser.reset(self)
 
     def setContext(self, context):
         qtproxies.i18n_context = context
@@ -46,8 +46,10 @@ class UICompiler(uiparser.UIParser):
     def createToplevelWidget(self, classname, widgetname):
         indenter = getIndenter()
         indenter.level = 0
+
         indenter.write("from PySide import QtCore, QtGui")
         indenter.write("")
+
         indenter.write("class Ui_%s(object):" % self.uiname)
         indenter.indent()
         indenter.write("def setupUi(self, %s):" % widgetname)
@@ -62,7 +64,7 @@ class UICompiler(uiparser.UIParser):
     def setDelayedProps(self):
         write_code("")
         write_code("self.retranslateUi(%s)" % self.toplevelWidget)
-        uiparser.UIParser.setDelayedProps(self)
+        UIParser.setDelayedProps(self)
 
     def finalize(self):
         indenter = getIndenter()
@@ -84,7 +86,7 @@ class UICompiler(uiparser.UIParser):
         # reset() before returning.
         self._resources = self.resources
 
-    def compileUi(self, input_stream, output_stream):
+    def compileUi(self, input_stream, output_stream, from_imports):
         createCodeIndenter(output_stream)
         w = self.parse(input_stream)
 
@@ -94,7 +96,7 @@ class UICompiler(uiparser.UIParser):
         self.factory._cpolicy._writeOutImports()
 
         for res in self._resources:
-            indenter.write("import %s" % res)
+            write_import(res, from_imports)
 
         return {"widgetname": str(w),
                 "uiclass" : w.uiclass,

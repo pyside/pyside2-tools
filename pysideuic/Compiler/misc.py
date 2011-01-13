@@ -1,7 +1,7 @@
 # This file is part of the PySide project.
 #
 # Copyright (C) 2009-2011 Nokia Corporation and/or its subsidiary(-ies).
-# Copyright (C) 2009 Riverbank Computing Limited.
+# Copyright (C) 2010 Riverbank Computing Limited.
 # Copyright (C) 2009 Torsten Marek
 #
 # Contact: PySide team <pyside@openbossa.org>
@@ -21,14 +21,32 @@
 # 02110-1301 USA
 
 
-# If pluginType is MODULE, the plugin loader will call moduleInformation.  The
-# variable MODULE is inserted into the local namespace by the plugin loader.
-pluginType = MODULE
+from pysideuic.Compiler.indenter import write_code
 
 
-# moduleInformation() must return a tuple (module, widget_list).  If "module"
-# is "A" and any widget from this module is used, the code generator will write
-# "import A".  If "module" is "A[.B].C", the code generator will write
-# "from A[.B] import C".  Each entry in "widget_list" must be unique.
-def moduleInformation():
-    return "PySide.QtWebKit", ("QWebView", )
+def write_import(module_name, from_imports):
+    if from_imports:
+        write_code("from . import %s" % module_name)
+    else:
+        write_code("import %s" % module_name)
+
+
+def moduleMember(module, name):
+    if module:
+        return "%s.%s" % (module, name)
+
+    return name
+
+
+class Literal(object):
+    """Literal(string) -> new literal
+
+    string will not be quoted when put into an argument list"""
+    def __init__(self, string):
+        self.string = string
+
+    def __str__(self):
+        return self.string
+
+    def __or__(self, r_op):
+        return Literal("%s|%s" % (self, r_op))

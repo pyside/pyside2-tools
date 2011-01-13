@@ -1,7 +1,7 @@
 # This file is part of the PySide project.
 #
-# Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
-# Copyright (C) 2009 Riverbank Computing Limited.
+# Copyright (C) 2009-2011 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (C) 2010 Riverbank Computing Limited.
 # Copyright (C) 2009 Torsten Marek
 #
 # Contact: PySide team <pyside@openbossa.org>
@@ -20,14 +20,16 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+import sys
 import os.path
 
-try:
-    set()
-except NameError:
-    from sets import Set as set
-
 from pysideuic.exceptions import NoSuchWidgetError, WidgetPluginError
+from port_v2.load_plugin import load_plugin
+
+
+# The list of directories that are searched for widget plugins.  This is
+# exposed as part of the API.
+widgetPluginPath = [os.path.join(os.path.dirname(__file__), 'widget-plugins')]
 
 
 MATCH = True
@@ -44,40 +46,35 @@ class QObjectCreator(object):
         self._modules = [self._cpolicy.createQtGuiWrapper()]
 
         # Get the optional plugins.
-        plugindir = os.path.join(os.path.split(__file__)[0],
-                                 "widget-plugins")
-
-        try:
-            plugins = os.listdir(plugindir)
-        except:
-            plugins = []
-
-        for filename in plugins:
-            if not filename.endswith(".py"):
-                continue
-            plugin_globals = {"MODULE" : MODULE,
-                              "CW_FILTER" : CW_FILTER,
-                              "MATCH": MATCH,
-                              "NO_MATCH": NO_MATCH}
-            plugin_locals = {}
+        for plugindir in widgetPluginPath:
             try:
-                execfile(os.path.join(plugindir, filename),
-                         plugin_globals, plugin_locals)
-                pluginType = plugin_locals["pluginType"]
-                if pluginType == MODULE:
-                    modinfo = plugin_locals["moduleInformation"]()
-                    self._modules.append(self._cpolicy.createModuleWrapper(*modinfo))
-                elif pluginType == CW_FILTER:
-                    self._cwFilters.append(plugin_locals["getFilter"]())
-                else:
-                    raise WidgetPluginError, "Unknown plugin type of %s" % (filename,)
-            except ImportError, e:
-                # plugins may raise an import error to be ignored
-                pass
-            except Exception, e:
-                # TODO: what about exception chaining?
-                raise WidgetPluginError, "%s: %s" % (e.__class__, str(e))
+                plugins = os.listdir(plugindir)
+            except:
+                plugins = []
 
+            for filename in plugins:
+                if not filename.endswith('.py'):
+                    continue
+
+                filename = os.path.join(plugindir, filename)
+
+                plugin_globals = {
+                    "MODULE": MODULE,
+                    "CW_FILTER": CW_FILTER,
+                    "MATCH": MATCH,
+                    "NO_MATCH": NO_MATCH}
+
+                plugin_locals = {}
+
+                if load_plugin(open(filename), plugin_globals, plugin_locals):
+                    pluginType = plugin_locals["pluginType"]
+                    if pluginType == MODULE:
+                        modinfo = plugin_locals["moduleInformation"]()
+                        self._modules.append(self._cpolicy.createModuleWrapper(*modinfo))
+                    elif pluginType == CW_FILTER:
+                        self._cwFilters.append(plugin_locals["getFilter"]())
+                    else:
+                        raise WidgetPluginError("Unknown plugin type of %s" % filename)
 
         self._customWidgets = self._cpolicy.createCustomWidgetLoader()
         self._modules.append(self._customWidgets)
@@ -86,7 +83,7 @@ class QObjectCreator(object):
         classType = self.findQObjectType(classname)
         if classType:
             return self._cpolicy.instantiate(classType, *args, **kwargs)
-        raise NoSuchWidgetError, classname
+        raise NoSuchWidgetError(classname)
 
     def invoke(self, rname, method, args=()):
         return self._cpolicy.invoke(rname, method, args)
@@ -105,6 +102,7 @@ class QObjectCreator(object):
         for cwFilter in self._cwFilters:
             match, result = cwFilter(widgetClass, baseClass, module)
             if match:
-                widgetClasse, baseClass, module = result
+                widgetClass, baseClass, module = result
                 break
+
         self._customWidgets.addCustomWidget(widgetClass, baseClass, module)

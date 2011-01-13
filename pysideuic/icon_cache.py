@@ -1,7 +1,8 @@
+#!/usr/bin/env python
 # This file is part of the PySide project.
 #
-# Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
-# Copyright (C) 2009 Riverbank Computing Limited.
+# Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (C) 2010 Riverbank Computing Limited.
 # Copyright (C) 2009 Torsten Marek
 #
 # Contact: PySide team <pyside@openbossa.org>
@@ -20,27 +21,32 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-"""Maintain a cache of icons.
 
-If an icon is used more than once by a GUI then ensure that only one copy is
-created.
-"""
+import os.path
 
 
 class IconCache(object):
-    """A cache of icons."""
+    """Maintain a cache of icons.  If an icon is used more than once by a GUI
+    then ensure that only one copy is created.
+    """
 
     def __init__(self, object_factory, qtgui_module):
         """Initialise the cache."""
 
         self._object_factory = object_factory
         self._qtgui_module = qtgui_module
+        self._base_dir = ''
         self._cache = []
+
+    def set_base_dir(self, base_dir):
+        """ Set the base directory to be used for all relative filenames. """
+
+        self._base_dir = base_dir
 
     def get_icon(self, iconset):
         """Return an icon described by the given iconset tag."""
 
-        iset = _IconSet(iconset)
+        iset = _IconSet(iconset, self._base_dir)
 
         try:
             idx = self._cache.index(iset)
@@ -69,11 +75,11 @@ class IconCache(object):
 class _IconSet(object):
     """An icon set, ie. the mode and state and the pixmap used for each."""
 
-    def __init__(self, iconset):
+    def __init__(self, iconset, base_dir):
         """Initialise the icon set from an XML tag."""
 
         # Set the pre-Qt v4.4 fallback (ie. with no roles).
-        self._fallback = iconset.text.replace("\\", "\\\\")
+        self._fallback = self._file_name(iconset.text, base_dir)
         self._use_fallback = True
 
         # Parse the icon set.
@@ -82,13 +88,24 @@ class _IconSet(object):
         for i in iconset:
             file_name = i.text
             if file_name is not None:
-                file_name = file_name.replace("\\", "\\\\")
+                file_name = self._file_name(file_name, base_dir)
 
             self._roles[i.tag] = file_name
             self._use_fallback = False
 
         # There is no real icon yet.
         self.icon = None
+
+    @staticmethod
+    def _file_name(fname, base_dir):
+        """ Convert a relative filename if we have a base directory. """
+
+        fname = fname.replace("\\", "\\\\")
+
+        if base_dir != '' and fname[0] != ':' and not os.path.isabs(fname):
+            fname = os.path.join(base_dir, fname)
+
+        return fname
 
     def set_icon(self, icon, qtgui_module):
         """Save the icon and set its attributes."""

@@ -1,8 +1,7 @@
 # This file is part of the PySide project.
 #
-# Copyright (C) 2009-2011 Nokia Corporation and/or its subsidiary(-ies).
-# Copyright (C) 2009 Riverbank Computing Limited.
-# Copyright (C) 2009 Torsten Marek
+# Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (C) 2010 Riverbank Computing Limited.
 #
 # Contact: PySide team <pyside@openbossa.org>
 #
@@ -20,15 +19,22 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-
-# If pluginType is MODULE, the plugin loader will call moduleInformation.  The
-# variable MODULE is inserted into the local namespace by the plugin loader.
-pluginType = MODULE
+import re
 
 
-# moduleInformation() must return a tuple (module, widget_list).  If "module"
-# is "A" and any widget from this module is used, the code generator will write
-# "import A".  If "module" is "A[.B].C", the code generator will write
-# "from A[.B] import C".  Each entry in "widget_list" must be unique.
-def moduleInformation():
-    return "PySide.QtWebKit", ("QWebView", )
+def as_string(obj, encode=True):
+    if isinstance(obj, basestring):
+        s = '"' + _escape(obj.encode('UTF-8')) + '"'
+        return s
+
+    return str(obj)
+
+
+_esc_regex = re.compile(r"(\"|\'|\\)")
+
+def _escape(text):
+    # This escapes any escaped single or double quote or backslash.
+    x = _esc_regex.sub(r"\\\1", text)
+
+    # This replaces any '\n' with an escaped version and a real line break.
+    return re.sub(r'\n', r'\\n"\n"', x)

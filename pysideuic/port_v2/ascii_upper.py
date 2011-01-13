@@ -1,8 +1,7 @@
 # This file is part of the PySide project.
 #
-# Copyright (C) 2009-2011 Nokia Corporation and/or its subsidiary(-ies).
-# Copyright (C) 2009 Riverbank Computing Limited.
-# Copyright (C) 2009 Torsten Marek
+# Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (C) 2010 Riverbank Computing Limited.
 #
 # Contact: PySide team <pyside@openbossa.org>
 #
@@ -20,15 +19,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-
-# If pluginType is MODULE, the plugin loader will call moduleInformation.  The
-# variable MODULE is inserted into the local namespace by the plugin loader.
-pluginType = MODULE
+import string
 
 
-# moduleInformation() must return a tuple (module, widget_list).  If "module"
-# is "A" and any widget from this module is used, the code generator will write
-# "import A".  If "module" is "A[.B].C", the code generator will write
-# "from A[.B] import C".  Each entry in "widget_list" must be unique.
-def moduleInformation():
-    return "PySide.QtWebKit", ("QWebView", )
+# A translation table for converting ASCII lower case to upper case.
+_ascii_trans_table = string.maketrans(string.ascii_lowercase,
+        string.ascii_uppercase)
+
+
+# Convert a string to ASCII upper case irrespective of the current locale.
+def ascii_upper(s):
+    return s.translate(_ascii_trans_table)

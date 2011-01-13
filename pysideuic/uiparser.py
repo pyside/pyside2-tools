@@ -1,7 +1,7 @@
 # This file is part of the PySide project.
 #
-# Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
-# Copyright (C) 2009 Riverbank Computing Limited.
+# Copyright (C) 2009-2011 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (C) 2010 Riverbank Computing Limited.
 # Copyright (C) 2009 Torsten Marek
 #
 # Contact: PySide team <pyside@openbossa.org>
@@ -24,7 +24,6 @@ import sys
 import logging
 import os.path
 import re
-from itertools import count
 
 try:
     from xml.etree.cElementTree import parse, SubElement
@@ -121,10 +120,15 @@ class UIParser(object):
         'foo1'
         """
         try:
-            return "%s%i" % (name, self.name_suffixes[name].next(),)
+            suffix = self.name_suffixes[name]
         except KeyError:
-            self.name_suffixes[name] = count(1)
+            self.name_suffixes[name] = 0
             return name
+
+        suffix += 1
+        self.name_suffixes[name] = suffix
+
+        return "%s%i" % (name, suffix)
 
     def reset(self):
         try: self.wprops.reset()
@@ -136,6 +140,8 @@ class UIParser(object):
         self.actions = []
         self.currentActionGroup = None
         self.resources = []
+        self.button_groups = []
+        self.layout_widget = False
 
     def setupObject(self, clsname, parent, branch, is_attribute = True):
         name = self.uniqueName(branch.attrib.get("name") or clsname[1:].lower())
@@ -151,27 +157,31 @@ class UIParser(object):
         return obj
 
     def createWidget(self, elem):
-        def widgetClass(elem):
-            cls = elem.attrib["class"].replace('::', '.')
-            if cls == "Line":
-                return "QFrame"
-            else:
-                return cls
-
         self.column_counter = 0
         self.row_counter = 0
         self.item_nr = 0
         self.itemstack = []
         self.sorting_enabled = None
 
+        widget_class = elem.attrib['class'].replace('::', '.')
+        if widget_class == 'Line':
+            widget_class = 'QFrame'
+
+        # Ignore the parent if it is a container.
         parent = self.stack.topwidget
-        if isinstance(parent, (QtGui.QToolBox, QtGui.QTabWidget,
-                               QtGui.QStackedWidget, QtGui.QDockWidget,
+        if isinstance(parent, (QtGui.QDockWidget, QtGui.QMdiArea,
+                               QtGui.QScrollArea, QtGui.QStackedWidget,
+                               QtGui.QToolBox, QtGui.QTabWidget,
                                QtGui.QWizard)):
             parent = None
 
+        # See if this is a layout widget.
+        if widget_class == 'QWidget':
+            if parent is not None:
+                if not isinstance(parent, QtGui.QMainWindow):
+                    self.layout_widget = True
 
-        self.stack.push(self.setupObject(widgetClass(elem), parent, elem))
+        self.stack.push(self.setupObject(widget_class, parent, elem))
 
         if isinstance(self.stack.topwidget, QtGui.QTableWidget):
             self.stack.topwidget.setColumnCount(len(elem.findall("column")))
@@ -180,20 +190,43 @@ class UIParser(object):
         self.traverseWidgetTree(elem)
         widget = self.stack.popWidget()
 
+        self.layout_widget = False
+
+        if isinstance(widget, QtGui.QTreeView):
+            self.handleHeaderView(elem, "header", widget.header())
+
+        elif isinstance(widget, QtGui.QTableView):
+            self.handleHeaderView(elem, "horizontalHeader",
+                    widget.horizontalHeader())
+            self.handleHeaderView(elem, "verticalHeader",
+                    widget.verticalHeader())
+
+        elif isinstance(widget, QtGui.QAbstractButton):
+            bg_i18n = self.wprops.getAttribute(elem, "buttonGroup")
+            if bg_i18n is not None:
+                bg_name = bg_i18n.string
+
+                for bg in self.button_groups:
+                    if bg.objectName() == bg_name:
+                        break
+                else:
+                    bg = self.factory.createQObject("QButtonGroup", bg_name,
+                            (self.toplevelWidget, ))
+                    bg.setObjectName(bg_name)
+                    self.button_groups.append(bg)
+
+                bg.addButton(widget)
+
         if self.sorting_enabled is not None:
             widget.setSortingEnabled(self.sorting_enabled)
+            self.sorting_enabled = None
 
         if self.stack.topIsLayout():
             lay = self.stack.peek()
             gp = elem.attrib["grid-position"]
 
             if isinstance(lay, QtGui.QFormLayout):
-                if gp[1]:
-                    role = QtGui.QFormLayout.FieldRole
-                else:
-                    role = QtGui.QFormLayout.LabelRole
-
-                lay.setWidget(gp[0], role, widget)
+                lay.setWidget(gp[0], self._form_layout_role(gp), widget)
             else:
                 lay.addWidget(widget, *gp)
 
@@ -239,11 +272,6 @@ class UIParser(object):
                 if tbArea is None:
                     topwidget.addToolBar(widget)
                 else:
-                    if isinstance(tbArea, basestring):
-                        tbArea = getattr(QtCore.Qt, tbArea)
-                    else:
-                        tbArea = QtCore.Qt.ToolBarArea(tbArea)
-
                     topwidget.addToolBar(tbArea, widget)
 
                 tbBreak = self.wprops.getAttribute(elem, "toolBarBreak")
@@ -260,21 +288,64 @@ class UIParser(object):
                 topwidget.addDockWidget(QtCore.Qt.DockWidgetArea(dwArea),
                         widget)
 
+    def handleHeaderView(self, elem, name, header):
+        value = self.wprops.getAttribute(elem, name + "Visible")
+        if value is not None:
+            header.setVisible(value)
+
+        value = self.wprops.getAttribute(elem, name + "CascadingSectionResizes")
+        if value is not None:
+            header.setCascadingSectionResizes(value)
+
+        value = self.wprops.getAttribute(elem, name + "DefaultSectionSize")
+        if value is not None:
+            header.setDefaultSectionSize(value)
+
+        value = self.wprops.getAttribute(elem, name + "HighlightSections")
+        if value is not None:
+            header.setHighlightSections(value)
+
+        value = self.wprops.getAttribute(elem, name + "MinimumSectionSize")
+        if value is not None:
+            header.setMinimumSectionSize(value)
+
+        value = self.wprops.getAttribute(elem, name + "ShowSortIndicator")
+        if value is not None:
+            header.setSortIndicatorShown(value)
+
+        value = self.wprops.getAttribute(elem, name + "StretchLastSection")
+        if value is not None:
+            header.setStretchLastSection(value)
+
     def createSpacer(self, elem):
-        width = int(elem.findtext("property/size/width"))
-        height = int(elem.findtext("property/size/height"))
-        sizeType = self.wprops.getProperty(elem, "sizeType")
-        if sizeType is None:
-            sizeType = "QSizePolicy::Expanding"
-        policy = (QtGui.QSizePolicy.Minimum,
-                  getattr(QtGui.QSizePolicy, sizeType.split("::")[-1]))
-        if self.wprops.getProperty(elem, "orientation") == "Qt::Horizontal":
+        width = elem.findtext("property/size/width")
+        height = elem.findtext("property/size/height")
+
+        if width is None or height is None:
+            size_args = ()
+        else:
+            size_args = (int(width), int(height))
+
+        sizeType = self.wprops.getProperty(elem, "sizeType",
+                QtGui.QSizePolicy.Expanding)
+
+        policy = (QtGui.QSizePolicy.Minimum, sizeType)
+
+        if self.wprops.getProperty(elem, "orientation") == QtCore.Qt.Horizontal:
             policy = policy[1], policy[0]
-        spacer = self.factory.createQObject("QSpacerItem", self.uniqueName("spacerItem"),
-                                       (width, height) + policy,
-                                        is_attribute = False)
+
+        spacer = self.factory.createQObject("QSpacerItem",
+                self.uniqueName("spacerItem"), size_args + policy,
+                is_attribute=False)
+
         if self.stack.topIsLayout():
-            self.stack.peek().addItem(spacer, *elem.attrib["grid-position"])
+            lay = self.stack.peek()
+            gp = elem.attrib["grid-position"]
+
+            if isinstance(lay, QtGui.QFormLayout):
+                lay.setItem(gp[0], self._form_layout_role(gp), spacer)
+            else:
+                lay.addItem(spacer, *gp)
 
     def createLayout(self, elem):
         # Qt v4.3 introduced setContentsMargins() and separate values for each
@@ -318,6 +389,13 @@ class UIParser(object):
                 SubElement(cme, 'number').text = str(top)
                 SubElement(cme, 'number').text = str(right)
                 SubElement(cme, 'number').text = str(bottom)
+        elif self.layout_widget:
+            # The layout's of layout widgets have no margin.
+            me = SubElement(elem, 'property', name='margin')
+            SubElement(me, 'number').text = '0'
+
+            # In case there are any nested layouts.
+            self.layout_widget = False
 
         # We do the same for setHorizontalSpacing() and setVerticalSpacing().
         horiz = self.wprops.getProperty(elem, 'horizontalSpacing', -1)
@@ -340,19 +418,36 @@ class UIParser(object):
         self.traverseWidgetTree(elem)
 
         layout = self.stack.popLayout()
+        self.configureLayout(elem, layout)
+
         if self.stack.topIsLayout():
             top_layout = self.stack.peek()
             gp = elem.attrib["grid-position"]
 
             if isinstance(top_layout, QtGui.QFormLayout):
-                if gp[1]:
-                    role = QtGui.QFormLayout.FieldRole
-                else:
-                    role = QtGui.QFormLayout.LabelRole
-
-                top_layout.setLayout(gp[0], role, layout)
+                top_layout.setLayout(gp[0], self._form_layout_role(gp), layout)
             else:
                 top_layout.addLayout(layout, *gp)
+
+    def configureLayout(self, elem, layout):
+        if isinstance(layout, QtGui.QGridLayout):
+            self.setArray(elem, 'columnminimumwidth',
+                    layout.setColumnMinimumWidth)
+            self.setArray(elem, 'rowminimumheight',
+                    layout.setRowMinimumHeight)
+            self.setArray(elem, 'columnstretch', layout.setColumnStretch)
+            self.setArray(elem, 'rowstretch', layout.setRowStretch)
+
+        elif isinstance(layout, QtGui.QBoxLayout):
+            self.setArray(elem, 'stretch', layout.setStretch)
+
+    def setArray(self, elem, name, setter):
+        array = elem.attrib.get(name)
+        if array:
+            for idx, value in enumerate(array.split(',')):
+                value = int(value)
+                if value > 0:
+                    setter(idx, value)
 
     def handleItem(self, elem):
         if self.stack.topIsLayout():
@@ -366,17 +461,21 @@ class UIParser(object):
                 icon = self.wprops.getProperty(elem, "icon")
 
                 if icon:
-                    w.addItem(icon, "")
+                    w.addItem(icon, '')
                 else:
-                    w.addItem("")
+                    w.addItem('')
 
                 w.setItemText(self.item_nr, text)
 
             elif isinstance(w, QtGui.QListWidget):
                 text = self.wprops.getProperty(elem, "text")
                 icon = self.wprops.getProperty(elem, "icon")
+                flags = self.wprops.getProperty(elem, "flags")
+                check_state = self.wprops.getProperty(elem, "checkState")
+                background = self.wprops.getProperty(elem, "background")
+                foreground = self.wprops.getProperty(elem, "foreground")
 
-                if icon:
+                if icon or flags or check_state:
                     item_name = "item"
                 else:
                     item_name = None
@@ -394,6 +493,18 @@ class UIParser(object):
                 if icon:
                     item.setIcon(icon)
 
+                if flags:
+                    item.setFlags(flags)
+
+                if check_state:
+                    item.setCheckState(check_state)
+
+                if background:
+                    item.setBackground(background)
+
+                if foreground:
+                    item.setForeground(foreground)
+
             elif isinstance(w, QtGui.QTreeWidget):
                 if self.itemstack:
                     parent, _ = self.itemstack[-1]
@@ -402,8 +513,8 @@ class UIParser(object):
                     parent = w
                     nr_in_root = self.item_nr
 
-                item = self.factory.createQObject("QTreeWidgetItem", "item",
-                        (parent, ), False)
+                item = self.factory.createQObject("QTreeWidgetItem",
+                        "item_%d" % len(self.itemstack), (parent, ), False)
 
                 if self.item_nr == 0 and not self.itemstack:
                     self.sorting_enabled = self.factory.invoke("__sortingEnabled", w.isSortingEnabled)
@@ -421,13 +532,22 @@ class UIParser(object):
                 column = -1
                 for prop in elem.findall("property"):
                     c_prop = self.wprops.convert(prop)
+                    c_prop_name = prop.attrib["name"]
 
-                    if prop.attrib["name"] == "text":
+                    if c_prop_name == "text":
                         column += 1
                         if c_prop:
                             titm.setText(column, c_prop)
-                    elif c_prop:
+                    elif c_prop_name == "icon":
                         item.setIcon(column, c_prop)
+                    elif c_prop_name == "flags":
+                        item.setFlags(c_prop)
+                    elif c_prop_name == "checkState":
+                        item.setCheckState(column, c_prop)
+                    elif c_prop_name == "background":
+                        item.setBackground(column, c_prop)
+                    elif c_prop_name == "foreground":
+                        item.setForeground(column, c_prop)
 
                 self.traverseWidgetTree(elem)
                 _, self.item_nr = self.itemstack.pop()
@@ -435,6 +555,10 @@ class UIParser(object):
             elif isinstance(w, QtGui.QTableWidget):
                 text = self.wprops.getProperty(elem, "text")
                 icon = self.wprops.getProperty(elem, "icon")
+                flags = self.wprops.getProperty(elem, "flags")
+                check_state = self.wprops.getProperty(elem, "checkState")
+                background = self.wprops.getProperty(elem, "background")
+                foreground = self.wprops.getProperty(elem, "foreground")
 
                 item = self.factory.createQObject("QTableWidgetItem", "item",
                         (), False)
@@ -446,13 +570,28 @@ class UIParser(object):
                 row = int(elem.attrib["row"])
                 col = int(elem.attrib["column"])
 
-                if text:
-                    w.item(row, col).setText(text)
-
                 if icon:
                     item.setIcon(icon)
 
+                if flags:
+                    item.setFlags(flags)
+
+                if check_state:
+                    item.setCheckState(check_state)
+
+                if background:
+                    item.setBackground(background)
+
+                if foreground:
+                    item.setForeground(foreground)
+
                 w.setItem(row, col, item)
+
+                if text:
+                    # Text is translated so we don't have access to the item
+                    # attribute when generating code so we must get it from the
+                    # widget after it has been set.
+                    w.item(row, col).setText(text)
 
             self.item_nr += 1
 
@@ -531,8 +670,9 @@ class UIParser(object):
         for child in iter(elem):
             try:
                 handler = self.widgetTreeItemHandlers[child.tag]
-            except KeyError, e:
+            except KeyError:
                 continue
+
             handler(self, child)
 
     def createUserInterface(self, elem):
@@ -609,13 +749,13 @@ class UIParser(object):
         self.defaults["spacing"] = int(elem.attrib["spacing"])
 
     def setTaborder(self, elem):
-        try:
-            lastwidget = getattr(self.toplevelWidget, elem[0].text)
-        except IndexError:
-            return
-        for widget in iter(elem[1:]):
-            widget = getattr(self.toplevelWidget, widget.text)
-            self.toplevelWidget.setTabOrder(lastwidget, widget)
+        lastwidget = None
+        for widget_elem in elem:
+            widget = getattr(self.toplevelWidget, widget_elem.text)
+
+            if lastwidget is not None:
+                self.toplevelWidget.setTabOrder(lastwidget, widget)
+
             lastwidget = widget
 
     def readResources(self, elem):
@@ -662,7 +802,7 @@ class UIParser(object):
                 if part not in ('', '.'):
                     if part == '..':
                         # We should allow this for Python3.
-                        raise SyntaxError, "custom widget header file name may not contain '..'."
+                        raise SyntaxError("custom widget header file name may not contain '..'.")
 
                     mpath.append(part)
 
@@ -671,23 +811,25 @@ class UIParser(object):
         for custom_widget in iter(elem):
             classname = custom_widget.findtext("class")
             if classname.startswith("Q3"):
-                raise NoSuchWidgetError, classname
+                raise NoSuchWidgetError(classname)
             self.factory.addCustomWidget(classname,
                                      custom_widget.findtext("extends") or "QWidget",
                                      header2module(custom_widget.findtext("header")))
 
     def createToplevelWidget(self, classname, widgetname):
-        raise NotImplementedError, "must be overridden"
+        raise NotImplementedError
 
     # finalize will be called after the whole tree has been parsed and can be
     # overridden.
     def finalize(self):
         pass
 
-    def parse(self, filename):
-        # the order in which the different branches are handled is important
-        # the widget tree handler relies on all custom widgets being known,
-        # and in order to create the connections, all widgets have to be populated
+    def parse(self, filename, base_dir=''):
+        self.wprops.set_base_dir(base_dir)
+
+        # The order in which the different branches are handled is important.
+        # The widget tree handler relies on all custom widgets being known, and
+        # in order to create the connections, all widgets have to be populated.
         branchHandlers = (
             ("layoutdefault", self.readDefaults),
             ("class",         self.classname),
@@ -701,8 +843,7 @@ class UIParser(object):
         document = parse(filename)
         version = document.getroot().attrib["version"]
         DEBUG("UI version is %s" % (version,))
-        # Right now, only version 4.0 is supported, which is used up to at
-        # least Qt 4.4.
+        # Right now, only version 4.0 is supported.
         assert version in ("4.0",)
         for tagname, actor in branchHandlers:
             elem = document.find(tagname)
@@ -712,3 +853,14 @@ class UIParser(object):
         w = self.toplevelWidget
         self.reset()
         return w
+
+    @staticmethod
+    def _form_layout_role(grid_position):
+        if grid_position[3] > 1:
+            role = QtGui.QFormLayout.SpanningRole
+        elif grid_position[1] == 1:
+            role = QtGui.QFormLayout.FieldRole
+        else:
+            role = QtGui.QFormLayout.LabelRole
+
+        return role

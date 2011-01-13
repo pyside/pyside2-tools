@@ -13,7 +13,7 @@ set(pyside_tools_MINOR_VERSION "2")
 set(pyside_tools_MICRO_VERSION "5")
 set(pyside_tools_VERSION "${pyside_tools_MAJOR_VERSION}.${pyside_tools_MINOR_VERSION}.${pyside_tools_MICRO_VERSION}")
 
-configure_file(pyside-uic.in pyside-uic @ONLY)
+configure_file("pysideuic/__init__.py.in" "__init__.py" @ONLY)
 
 # UIC stuff
 execute_process(
@@ -25,16 +25,18 @@ if (NOT SITE_PACKAGE)
     message(FATAL_ERROR "Could not detect Python module installation directory.")
 endif()
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pyside-uic
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/pyside-uic
         DESTINATION bin
         PERMISSIONS
         OWNER_EXECUTE OWNER_WRITE OWNER_READ
         GROUP_EXECUTE GROUP_READ
         WORLD_EXECUTE WORLD_READ)
 
-
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py"
+        DESTINATION "${SITE_PACKAGE}/pysideuic")
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pysideuic
-        DESTINATION ${SITE_PACKAGE})
+        DESTINATION ${SITE_PACKAGE}
+        PATTERN "*.in" EXCLUDE)
 
 # Man pages for pyside-uic
 if (NOT win32)

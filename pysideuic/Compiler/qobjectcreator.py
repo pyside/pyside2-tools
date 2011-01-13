@@ -1,7 +1,7 @@
 # This file is part of the PySide project.
 #
-# Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
-# Copyright (C) 2009 Riverbank Computing Limited.
+# Copyright (C) 2009-2011 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (C) 2010 Riverbank Computing Limited.
 # Copyright (C) 2009 Torsten Marek
 #
 # Contact: PySide team <pyside@openbossa.org>
@@ -20,6 +20,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+
 import logging
 
 try:
@@ -27,8 +28,8 @@ try:
 except NameError:
     from sets import Set as set
 
-from qtproxies import QtGui, Literal, strict_getattr
-from indenter import write_code
+from pysideuic.Compiler.indenter import write_code
+from pysideuic.Compiler.qtproxies import QtGui, Literal, strict_getattr
 
 
 logger = logging.getLogger(__name__)
@@ -54,6 +55,7 @@ class _ModuleWrapper(object):
         else:
             self._package = None
             self._module = name
+
         self._classes = set(classes)
         self._used = False
 
@@ -90,10 +92,10 @@ class _CustomWidgetLoader(object):
 
                 baseClass = self._widgets[baseClass][0]
             else:
-                raise ValueError, "baseclass resolve took to long, check custom widgets"
+                raise ValueError("baseclass resolve took too long, check custom widgets")
 
         except KeyError:
-            raise ValueError, "unknown baseclass %s" % (baseClass,)
+            raise ValueError("unknown baseclass %s" % baseClass)
 
 
     def search(self, cls):
@@ -114,7 +116,7 @@ class _CustomWidgetLoader(object):
             _, module = self._widgets[widget]
             imports.setdefault(module, []).append(widget)
 
-        for module, classes in imports.iteritems():
+        for module, classes in imports.items():
             write_code("from %s import %s" % (module, ", ".join(classes)))
 
 
