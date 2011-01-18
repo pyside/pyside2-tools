@@ -16,13 +16,15 @@ set(pyside_tools_VERSION "${pyside_tools_MAJOR_VERSION}.${pyside_tools_MINOR_VER
 configure_file("pysideuic/__init__.py.in" "__init__.py" @ONLY)
 
 # UIC stuff
-execute_process(
-    COMMAND ${PYTHON_EXECUTABLE} -c "from distutils import sysconfig; \\
-        print sysconfig.get_python_lib(1,0,prefix='${CMAKE_INSTALL_PREFIX}')"
-    OUTPUT_VARIABLE SITE_PACKAGE
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
 if (NOT SITE_PACKAGE)
-    message(FATAL_ERROR "Could not detect Python module installation directory.")
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -c "from distutils import sysconfig; \\
+            print sysconfig.get_python_lib(1,0,prefix='${CMAKE_INSTALL_PREFIX}')"
+        OUTPUT_VARIABLE SITE_PACKAGE
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (NOT SITE_PACKAGE)
+        message(FATAL_ERROR "Could not detect Python module installation directory.")
+    endif()
 endif()
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/pyside-uic
