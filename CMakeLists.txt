@@ -38,7 +38,9 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py"
         DESTINATION "${SITE_PACKAGE}/pysideuic")
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pysideuic
         DESTINATION ${SITE_PACKAGE}
-        PATTERN "*.in" EXCLUDE)
+        PATTERN "*.in" EXCLUDE
+        PATTERN "*pysideuic/__init__.py" EXCLUDE
+        PATTERN "*pysideuic\\__init__.py" EXCLUDE)
 
 # Man pages for pyside-uic
 if (NOT win32)
