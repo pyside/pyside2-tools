@@ -123,8 +123,8 @@ class Properties(object):
         if prop.get('notr', notr) == 'true':
             return text
 
-        return QtGui.QApplication.translate(self.uiname, text, None,
-                QtGui.QApplication.UnicodeUTF8)
+        return QtGui.QApplication.translate(self.uiname, text,
+                prop.get('comment'), QtGui.QApplication.UnicodeUTF8)
 
     _char = _string
 
@@ -389,13 +389,13 @@ class Properties(object):
 
     # Delayed properties will be set after the whole widget tree has been
     # populated.
-    def _delay(self, widget, prop):
+    def _delayed_property(self, widget, prop):
         prop_value = self.convert(prop)
         if prop_value is not None:
             prop_name = prop.attrib["name"]
-            self.delayed_props.append((
-                getattr(widget, "set%s%s" % (ascii_upper(prop_name[0]), prop_name[1:])),
-                prop_value))
+            self.delayed_props.append((widget, False,
+                    'set%s%s' % (ascii_upper(prop_name[0]), prop_name[1:]),
+                    prop_value))
 
     # These properties will be set with a widget.setProperty call rather than
     # calling the set<property> function.
@@ -409,8 +409,8 @@ class Properties(object):
         pass
 
     # Define properties that use the canned handlers.
-    currentIndex = _delay
-    currentRow = _delay
+    currentIndex = _delayed_property
+    currentRow = _delayed_property
 
     showDropIndicator = _setViaSetProperty
     intValue = _setViaSetProperty
@@ -423,6 +423,12 @@ class Properties(object):
     bottomMargin = _ignore
     horizontalSpacing = _ignore
     verticalSpacing = _ignore
+
+    # tabSpacing is actually the spacing property of the widget's layout.
+    def tabSpacing(self, widget, prop):
+        prop_value = self.convert(prop)
+        if prop_value is not None:
+            self.delayed_props.append((widget, True, 'setSpacing', prop_value))
 
     # buddy setting has to be done after the whole widget tree has been
     # populated.  We can't use delay here because we cannot get the actual

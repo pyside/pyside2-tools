@@ -57,11 +57,17 @@ def strict_getattr(module, clsname):
 
 
 class i18n_string(object):
-    def __init__(self, string):
+    def __init__(self, string, disambig):
         self.string = string
+        self.disambig = disambig
 
     def __str__(self):
-        return "QtGui.QApplication.translate(\"%s\", %s, None, QtGui.QApplication.UnicodeUTF8)" % (i18n_context, as_string(self.string, encode=False))
+        if self.disambig is None:
+            disambig = "None"
+        else:
+            disambig = as_string(self.disambig, encode=False)
+
+        return 'QtGui.QApplication.translate("%s", %s, %s, QtGui.QApplication.UnicodeUTF8)' % (i18n_context, as_string(self.string, encode=False), disambig)
 
 
 # Classes with this flag will be handled as literal values. If functions are
@@ -206,8 +212,8 @@ _qwidgets = ("QCalendarWidget", "QDialogButtonBox", "QDockWidget", "QGroupBox",
 
 class QtGui(ProxyNamespace):
     class QApplication(QtCore.QObject):
-        def translate(uiname, text, context, encoding):
-            return i18n_string(text or "")
+        def translate(uiname, text, disambig, encoding):
+            return i18n_string(text or "", disambig)
         translate = staticmethod(translate)
 
     class QIcon(ProxyClass): pass
@@ -215,6 +221,7 @@ class QtGui(ProxyNamespace):
     class QLinearGradient(ProxyClass): pass
     class QRadialGradient(ProxyClass): pass
     class QBrush(ProxyClass): pass
+    class QPainter(ProxyClass): pass
     class QPalette(ProxyClass): pass
     class QFont(ProxyClass): pass
     class QSpacerItem(ProxyClass): pass
@@ -258,10 +265,14 @@ class QtGui(ProxyNamespace):
 
     class QTabWidget(QWidget):
         def addTab(self, *args):
-            i18n_print("%s.setTabText(%s.indexOf(%s), %s)" % \
-                       (self._uic_name, self._uic_name, args[0], args[-1]))
-            pargs = args[:-1] + ("",)
-            ProxyClassMember(self, "addTab", 0)(*pargs)
+            text = args[-1]
+
+            if isinstance(text, i18n_string):
+                i18n_print("%s.setTabText(%s.indexOf(%s), %s)" % \
+                        (self._uic_name, self._uic_name, args[0], text))
+                args = args[:-1] + ("", )
+
+            ProxyClassMember(self, "addTab", 0)(*args)
 
         def indexOf(self, page):
             return Literal("%s.indexOf(%s)" % (self, page))
@@ -285,13 +296,21 @@ class QtGui(ProxyNamespace):
 
     class QToolBox(QFrame):
         def addItem(self, *args):
-            i18n_print("%s.setItemText(%s.indexOf(%s), %s)" % \
-                       (self._uic_name, self._uic_name, args[0], args[-1]))
-            pargs = args[:-1] + ("",)
-            ProxyClassMember(self, "addItem", 0)(*pargs)
+            text = args[-1]
+
+            if isinstance(text, i18n_string):
+                i18n_print("%s.setItemText(%s.indexOf(%s), %s)" % \
+                        (self._uic_name, self._uic_name, args[0], text))
+                args = args[:-1] + ("", )
+
+            ProxyClassMember(self, "addItem", 0)(*args)
 
         def indexOf(self, page):
             return Literal("%s.indexOf(%s)" % (self, page))
+
+        def layout(self):
+            return QtGui.QLayout("%s.layout()" % self,
+                    False, (), noInstantiation=True)
 
     class QAbstractScrollArea(QFrame): pass
     class QGraphicsView(QAbstractScrollArea): pass

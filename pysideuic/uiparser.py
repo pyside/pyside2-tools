@@ -714,8 +714,12 @@ class UIParser(object):
                     widget.addAction(action_obj)
 
     def setDelayedProps(self):
-        for func, args in self.wprops.delayed_props:
-            func(args)
+        for widget, layout, setter, args in self.wprops.delayed_props:
+            if layout:
+                widget = widget.layout()
+
+            setter = getattr(widget, setter)
+            setter(args)
 
     def setBuddies(self):
         for widget, buddy in self.wprops.buddies:
