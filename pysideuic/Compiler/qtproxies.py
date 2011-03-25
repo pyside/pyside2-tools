@@ -232,7 +232,10 @@ class QtGui(ProxyNamespace):
     class QAction(QtCore.QObject): pass
     class QActionGroup(QtCore.QObject): pass
     class QButtonGroup(QtCore.QObject): pass
-    class QLayout(QtCore.QObject): pass
+    class QLayout(QtCore.QObject):
+        def setMargin(self, v):
+            ProxyClassMember(self, "setContentsMargins", 0)(v, v, v, v);
+
     class QGridLayout(QLayout): pass
     class QBoxLayout(QLayout): pass
     class QHBoxLayout(QBoxLayout): pass
