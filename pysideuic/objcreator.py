@@ -53,7 +53,7 @@ class QObjectCreator(object):
                 plugins = []
 
             for filename in plugins:
-                if not filename.endswith('.py'):
+                if not filename.endswith('.py') or filename == '__init__.py':
                     continue
 
                 filename = os.path.join(plugindir, filename)
