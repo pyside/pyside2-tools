@@ -2,7 +2,7 @@
  * This file is part of the PySide Tools project.
  *
  * Copyright (C) 1992-2005 Trolltech AS. All rights reserved.
- * Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2009-2011 Nokia Corporation and/or its subsidiary(-ies).
  *
  * Contact: PySide team <pyside@openbossa.org>
  *
@@ -58,7 +58,12 @@ static bool qt_rcc_write_number(FILE *out, quint32 number, int width)
     while (dividend >= 1) {
         const quint8 tmp = number / dividend;
 
-        fprintf(out, "\\x%02x", tmp);
+        if (tmp >= 32 && tmp <= 127) {
+            /* Optimization for printable characters */
+            fprintf(out, "%c", tmp);
+        } else {
+            fprintf(out, "\\x%02x", tmp);
+        }
 
         number -= tmp * dividend;
         dividend /= 256;
@@ -95,7 +100,6 @@ bool RCCFileInfo::writeDataInfo(FILE *out)
         //data offset
         qt_rcc_write_number(out, dataOffset, 4);
     }
-    fprintf(out, "\\\n");
     return true;
 }
 
@@ -124,22 +128,18 @@ qint64 RCCFileInfo::writeDataBlob(FILE *out, qint64 offset)
         }
     }
 #endif // QT_NO_COMPRESS
-    
+
     //write the length
     qt_rcc_write_number(out, data.size(), 4);
-    fprintf(out, "\\\n");
     offset += 4;
 
     //write the payload
     for (int i=0; i<data.size(); i++) {
         qt_rcc_write_number(out, data.at(i), 1);
-        if(!(i % 16))
-            fprintf(out, "\\\n");
     }
     offset += data.size();
 
     //done
-    fprintf(out, "\\\n");
     return offset;
 }
 
@@ -150,25 +150,20 @@ qint64 RCCFileInfo::writeDataName(FILE *out, qint64 offset)
 
     //write the length
     qt_rcc_write_number(out, name.length(), 2);
-    fprintf(out, "\\\n");
     offset += 2;
 
     //write the hash
     qt_rcc_write_number(out, qHash(name), 4);
-    fprintf(out, "\\\n");
     offset += 4;
 
     //write the name
     const QChar *unicode = name.unicode();
     for (int i=0; i<name.length(); i++) {
         qt_rcc_write_number(out, unicode[i].unicode(), 2);
-        if(!(i % 16))
-            fprintf(out, "\\\n");
     }
     offset += name.length()*2;
 
     //done
-    fprintf(out, "\\\n");
     return offset;
 }
 
@@ -416,7 +411,7 @@ RCCResourceLibrary::writeHeader(FILE *out)
 bool
 RCCResourceLibrary::writeDataBlobs(FILE *out)
 {
-    fprintf(out, "qt_resource_data = %s\"\\\n", mPrefix);
+    fprintf(out, "qt_resource_data = %s\"", mPrefix);
     QStack<RCCFileInfo*> pending;
 
     if (!root)
@@ -435,14 +430,14 @@ RCCResourceLibrary::writeDataBlobs(FILE *out)
                 offset = child->writeDataBlob(out, offset);
         }
     }
-    fprintf(out, "\"\n\n");
+    fprintf(out, "\"\n");
     return true;
 }
 
 bool
 RCCResourceLibrary::writeDataNames(FILE *out)
 {
-    fprintf(out, "qt_resource_name = %s\"\\\n", mPrefix);
+    fprintf(out, "qt_resource_name = %s\"", mPrefix);
 
     QHash<QString, int> names;
     QStack<RCCFileInfo*> pending;
@@ -467,7 +462,7 @@ RCCResourceLibrary::writeDataNames(FILE *out)
             }
         }
     }
-    fprintf(out, "\"\n\n");
+    fprintf(out, "\"\n");
     return true;
 }
 
@@ -479,7 +474,7 @@ static bool qt_rcc_compare_hash(const RCCFileInfo *left, const RCCFileInfo *righ
 bool
 RCCResourceLibrary::writeDataStructure(FILE *out)
 {
-    fprintf(out, "qt_resource_struct = %s\"\\\n", mPrefix);
+    fprintf(out, "qt_resource_struct = %s\"", mPrefix);
     QStack<RCCFileInfo*> pending;
 
     if (!root)
@@ -523,7 +518,7 @@ RCCResourceLibrary::writeDataStructure(FILE *out)
                 pending.push(child);
         }
     }
-    fprintf(out, "\"\n\n");
+    fprintf(out, "\"\n");
 
     return true;
 }

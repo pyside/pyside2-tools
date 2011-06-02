@@ -8,6 +8,6 @@
 # $3: qrc file
 
 export PYTHONPATH=$PYTHONPATH:`pwd`
-pyside-rcc4 -o `basename $3 .qrc`_rc.py $3
+pyside-rcc -o `basename $3 .qrc`_rc.py $3
 cd $4
 $1 $2

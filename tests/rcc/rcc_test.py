@@ -18,6 +18,12 @@ class TestRccSimple(unittest.TestCase):
         original = open("shining.txt", "r")
         self.assertEqual(handle.readLine(), original.readline())
 
+    def testHuge(self):
+        handle = QFile(":manychars.txt")
+        handle.open(QFile.ReadOnly)
+        original = open("manychars.txt", "r")
+        self.assertEqual(handle.readLine(), original.readline())
+
 
 if __name__ == '__main__':
     unittest.main()
