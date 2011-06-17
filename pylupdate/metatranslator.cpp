@@ -434,6 +434,9 @@ bool MetaTranslator::save( const QString& filename ) const
             }
         } while ( ++m != mm.end() && QByteArray(m.key().context()) == context );
 
+        if ( inv.isEmpty() )
+            continue;
+
         t << "<context";
         if ( contextIsUtf8 )
             t << " encoding=\"UTF-8\"";
@@ -590,12 +593,12 @@ bool MetaTranslator::contains( const char *context, const char *sourceText,
 MetaTranslatorMessage MetaTranslator::find( const char *context,
         const char *sourceText, const char *comment ) const
 {
-    QMap<MetaTranslatorMessage, int>::const_iterator it = 
+    QMap<MetaTranslatorMessage, int>::const_iterator it =
         mm.constFind(MetaTranslatorMessage(context, sourceText, comment, QString(), 0));
     return (it == mm.constEnd() ? MetaTranslatorMessage() : it.key());
 }
 
-MetaTranslatorMessage MetaTranslator::find(const char *context, const char *comment, 
+MetaTranslatorMessage MetaTranslator::find(const char *context, const char *comment,
                                 const QString &fileName, int lineNumber) const
 {
     if (lineNumber >= 0 && !fileName.isEmpty()) {
@@ -674,7 +677,7 @@ void MetaTranslator::makeFileNamesAbsolute(const QDir &oldPath)
         if (fi.isRelative()) {
             fileName = oldPath.absoluteFilePath(fileName);
         }
-        
+
         msg.setFileName(fileName);
         newmm.insert(msg, m.value());
     }

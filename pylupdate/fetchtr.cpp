@@ -89,6 +89,18 @@ static int (*peekChar)();
 
 static bool yyParsingUtf8;
 
+static int yyIndentationSize;
+static int yyContinuousSpaceCount;
+static bool yyCountingIndentation;
+
+// (Context, indentation level) pair.
+typedef QPair<QByteArray, int> ContextPair;
+// Stack of (Context, indentation level) pairs.
+typedef QStack<ContextPair> ContextStack;
+static ContextStack yyContextStack;
+
+static int yyContextPops;
+
 static int getCharFromFile()
 {
     int c;
@@ -99,8 +111,26 @@ static int getCharFromFile()
         c = buf;
         buf = -1;
     }
-    if ( c == '\n' )
+    if ( c == '\n' ) {
         yyCurLineNo++;
+        yyCountingIndentation = true;
+        yyContinuousSpaceCount = 0;
+    } else if ( yyCountingIndentation && ( c == 32 || c == 9 ) ) {
+        yyContinuousSpaceCount++;
+    } else {
+        if ( yyIndentationSize == 1 && yyContinuousSpaceCount > yyIndentationSize )
+            yyIndentationSize = yyContinuousSpaceCount;
+        if ( yyCountingIndentation && yyContextStack.count() > 1 ) {
+            ContextPair& top = yyContextStack.top();
+            if ( top.second == 0 && yyContinuousSpaceCount > 0 ) {
+                top.second = yyContinuousSpaceCount;
+                yyContinuousSpaceCount = 0;
+            } else if ( yyContinuousSpaceCount < top.second ) {
+                yyContextPops = (top.second - yyContinuousSpaceCount) / yyIndentationSize;
+            }
+        }
+        yyCountingIndentation = false;
+    }
     return c;
 }
 
@@ -132,6 +162,11 @@ static void startTokenizer( const char *fileName, int (*getCharFunc)(),
     yyCodecForSource = codecForSource;
 
     yyParsingUtf8 = false;
+    yyIndentationSize = 1;
+    yyContinuousSpaceCount = 0;
+    yyCountingIndentation = false;
+    yyContextStack.clear();
+    yyContextPops = 0;
 }
 
 static int getToken()
@@ -144,7 +179,6 @@ static int getToken()
     yyIdentLen = 0;
     yyCommentLen = 0;
     yyStringLen = 0;
-
     while ( yyCh != EOF ) {
         yyLineNo = yyCurLineNo;
 
@@ -163,12 +197,12 @@ static int getToken()
                     break;
                 case 'Q':
                     if ( strcmp(yyIdent + 1, "T_TR_NOOP") == 0 ) {
-                    yyParsingUtf8 = false;
+                        yyParsingUtf8 = false;
                         return Tok_tr;
                     } else if ( strcmp(yyIdent + 1, "T_TRANSLATE_NOOP") == 0 ) {
-                    yyParsingUtf8 = false;
-                    return Tok_translate;
-                }
+                        yyParsingUtf8 = false;
+                        return Tok_translate;
+                    }
                 break;
                 case 'c':
                     if ( strcmp(yyIdent + 1, "lass") == 0 )
@@ -533,20 +567,28 @@ static bool matchExpression()
 static void parse( MetaTranslator *tor, const char *initialContext,
            const char *defaultContext )
 {
-    QMap<QByteArray, QByteArray> qualifiedContexts;
     QByteArray context;
     QByteArray text;
     QByteArray com;
-    QByteArray functionContext = initialContext;
     QByteArray prefix;
     bool utf8 = false;
 
+    yyContextStack.push(ContextPair(initialContext, 0));
+
     yyTok = getToken();
     while ( yyTok != Tok_Eof ) {
+
+        if (yyContextPops > 0) {
+            for ( int i = 0; i < yyContextPops; i++)
+                yyContextStack.pop();
+            yyContextPops = 0;
+        }
+
         switch ( yyTok ) {
-        case Tok_class:
+            case Tok_class:
                 yyTok = getToken();
-                functionContext = yyIdent;
+                yyContextStack.push(ContextPair(yyIdent, 0));
+                yyContinuousSpaceCount = 0;
                 yyTok = getToken();
                 break;
             case Tok_tr:
@@ -579,14 +621,11 @@ static void parse( MetaTranslator *tor, const char *initialContext,
                     if (prefix.isNull())
                         context = defaultContext;
                     else if (qstrcmp(prefix, "self") == 0)
-                        context = functionContext;
+                        context = yyContextStack.top().first;
                     else
                         context = prefix;
 
                     prefix = (const char *) 0;
-
-                    if (qualifiedContexts.contains(context))
-                        context = qualifiedContexts[context];
 
                     if (!text.isEmpty())
                     {
