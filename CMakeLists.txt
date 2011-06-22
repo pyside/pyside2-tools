@@ -4,11 +4,11 @@ project(pyside-tools)
 
 find_package(PythonInterp REQUIRED)
 find_package(Qt4 4.5.0 REQUIRED)
-find_package(PySide 1.0.3 REQUIRED)
+find_package(PySide 1.0.4 REQUIRED)
 
 set(pyside_tools_MAJOR_VERSION "0")
 set(pyside_tools_MINOR_VERSION "2")
-set(pyside_tools_MICRO_VERSION "9")
+set(pyside_tools_MICRO_VERSION "10")
 set(pyside_tools_VERSION "${pyside_tools_MAJOR_VERSION}.${pyside_tools_MINOR_VERSION}.${pyside_tools_MICRO_VERSION}")
 
 configure_file("pysideuic/__init__.py.in" "__init__.py" @ONLY)
