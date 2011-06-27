@@ -58,7 +58,7 @@ static bool qt_rcc_write_number(FILE *out, quint32 number, int width)
     while (dividend >= 1) {
         const quint8 tmp = number / dividend;
 
-        if (tmp >= 32 && tmp <= 127) {
+        if (tmp >= 32 && tmp < 127 && tmp != '"' && tmp != '\\') {
             /* Optimization for printable characters */
             fprintf(out, "%c", tmp);
         } else {
