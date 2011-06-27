@@ -65,6 +65,7 @@ add_custom_target(dist
             echo "Source package created at ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.bz2.\n"
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
+set(PYSIDERCC_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/pyrcc/pyside-rcc)
 add_subdirectory(pyrcc)
 add_subdirectory(pylupdate)
 
