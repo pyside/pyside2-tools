@@ -167,13 +167,18 @@ class UIParser(object):
         if widget_class == 'Line':
             widget_class = 'QFrame'
 
-        # Ignore the parent if it is a container.
+        # Ignore the parent if it is a container
         parent = self.stack.topwidget
+
+        # if is a Menubar on MacOS
+        macMenu = (sys.platform == 'darwin') and (widget_class == 'QMenuBar')
+
         if isinstance(parent, (QtGui.QDockWidget, QtGui.QMdiArea,
                                QtGui.QScrollArea, QtGui.QStackedWidget,
                                QtGui.QToolBox, QtGui.QTabWidget,
-                               QtGui.QWizard)):
+                               QtGui.QWizard)) or macMenu:
             parent = None
+
 
         # See if this is a layout widget.
         if widget_class == 'QWidget':
