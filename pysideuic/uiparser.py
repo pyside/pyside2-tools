@@ -624,6 +624,7 @@ class UIParser(object):
 
             text = self.wprops.getProperty(elem, "text")
             icon = self.wprops.getProperty(elem, "icon")
+            whatsThis = self.wprops.getProperty(elem, "whatsThis")
 
             item = self.factory.createQObject("QTableWidgetItem", "item",
                         (), False)
@@ -637,6 +638,9 @@ class UIParser(object):
                 if icon:
                     item.setIcon(icon)
 
+                if whatsThis:
+                    w.horizontalHeaderItem(self.column_counter).setWhatsThis(whatsThis)
+
                 self.column_counter += 1
             elif elem.tag == "row":
                 w.setVerticalHeaderItem(self.row_counter, item)
@@ -646,6 +650,9 @@ class UIParser(object):
 
                 if icon:
                     item.setIcon(icon)
+
+                if whatsThis:
+                    w.verticalHeaderItem(self.row_counter).setWhatsThis(whatsThis)
 
                 self.row_counter += 1
 
