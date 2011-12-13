@@ -101,6 +101,34 @@ static void updateTsFiles( const MetaTranslator& fetchedTor,
     }
 }
 
+/* The filename may contain double quotes when passing filenames with
+ * whitespaces. So we need to make it proper to be called with fopen()
+ * function. Handle them properly.
+*/
+static inline const QStringList parseFileNames(const QString& line)
+{
+    QStringList retval;
+
+    QString s;
+    unsigned int count = 0;
+    foreach(QChar c, line) {
+        if (c == '"') { /* we're still walking through the path... */
+            count++;
+        } else if (c.isSpace() && !(count % 2)) { /* path is done! */
+            /* append it to our list */
+            retval << s;
+            s.clear();
+        } else {
+            s += c;
+        }
+    }
+
+    if (s.size())
+        retval << s; /* append the last path to our list */
+
+    return retval;
+}
+
 int main( int argc, char **argv )
 {
     QString defaultContext = "@default";
@@ -180,9 +208,9 @@ int main( int argc, char **argv )
             QMap<QString, QString>::Iterator it;
 
             for ( it = tagMap.begin(); it != tagMap.end(); ++it ) {
-                QStringList toks = it.value().split(' ');
-                QStringList::Iterator t;
+                QStringList toks = parseFileNames(it.value());
 
+                QStringList::Iterator t;
                 for ( t = toks.begin(); t != toks.end(); ++t ) {
                     if ( it.key() == "SOURCES" ) {
                         fetchtr_py( (*t).toAscii(), &fetchedTor, defaultContext.toAscii(), true, codecForSource );
