@@ -559,11 +559,6 @@ class UIParser(object):
 
             elif isinstance(w, QtGui.QTableWidget):
                 text = self.wprops.getProperty(elem, "text")
-                icon = self.wprops.getProperty(elem, "icon")
-                flags = self.wprops.getProperty(elem, "flags")
-                check_state = self.wprops.getProperty(elem, "checkState")
-                background = self.wprops.getProperty(elem, "background")
-                foreground = self.wprops.getProperty(elem, "foreground")
 
                 item = self.factory.createQObject("QTableWidgetItem", "item",
                         (), False)
@@ -575,18 +570,23 @@ class UIParser(object):
                 row = int(elem.attrib["row"])
                 col = int(elem.attrib["column"])
 
+                icon = self.wprops.getProperty(elem, "icon")
                 if icon:
                     item.setIcon(icon)
 
+                flags = self.wprops.getProperty(elem, "flags")
                 if flags:
                     item.setFlags(flags)
 
+                check_state = self.wprops.getProperty(elem, "checkState")
                 if check_state:
                     item.setCheckState(check_state)
 
+                background = self.wprops.getProperty(elem, "background")
                 if background:
                     item.setBackground(background)
 
+                foreground = self.wprops.getProperty(elem, "foreground")
                 if foreground:
                     item.setForeground(foreground)
 
