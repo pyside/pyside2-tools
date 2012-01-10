@@ -24,7 +24,11 @@ import sys
 import os.path
 
 from pysideuic.exceptions import NoSuchWidgetError, WidgetPluginError
-from port_v2.load_plugin import load_plugin
+
+if sys.hexversion >= 0x03000000:
+    from pysideuic.port_v3.load_plugin import load_plugin
+else:
+    from pysideuic.port_v2.load_plugin import load_plugin
 
 
 # The list of directories that are searched for widget plugins.  This is

@@ -32,7 +32,10 @@ from pysideuic import __version__ as PySideUicVersion
 Version = "PySide User Interface Compiler version %s, running on PySide %s." % (PySideUicVersion, PySideVersion)
 
 def main():
-    from pysideuic.port_v2.invoke import invoke
+    if sys.hexversion >= 0x03000000:
+        from pysideuic.port_v3.invoke import invoke
+    else:
+        from pysideuic.port_v2.invoke import invoke
 
     parser = optparse.OptionParser(usage="pyside-uic [options] <ui-file>",
             version=Version)
