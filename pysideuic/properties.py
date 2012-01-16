@@ -27,8 +27,10 @@ import sys
 from pysideuic.exceptions import UnsupportedPropertyError
 from pysideuic.icon_cache import IconCache
 
-from pysideuic.port_v2.ascii_upper import ascii_upper
-
+if sys.hexversion >= 0x03000000:
+    from pysideuic.port_v3.ascii_upper import ascii_upper
+else:
+    from pysideuic.port_v2.ascii_upper import ascii_upper
 
 logger = logging.getLogger(__name__)
 DEBUG = logger.debug
