@@ -1,8 +1,7 @@
-
 cmake_minimum_required(VERSION 2.6)
 project(pyside-tools)
 
-find_package(PythonInterp REQUIRED)
+find_package(Shiboken 1.1.1 REQUIRED)
 find_package(Qt4 4.5.0 REQUIRED)
 find_package(PySide 1.0.6 REQUIRED)
 
@@ -18,7 +17,7 @@ option(BUILD_TESTS "Build tests." TRUE)
 # UIC stuff
 if (NOT SITE_PACKAGE)
     execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} -c "from __future__ import print_function; \\
+        COMMAND ${SHIBOKEN_PYTHON_INTERPRETER} -c "from __future__ import print_function; \\
             from distutils import sysconfig; \\
             print(sysconfig.get_python_lib(1,0,prefix='${CMAKE_INSTALL_PREFIX}'))"
         OUTPUT_VARIABLE SITE_PACKAGE
@@ -74,3 +73,4 @@ if (BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif ()
+
