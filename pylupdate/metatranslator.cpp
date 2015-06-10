@@ -164,9 +164,9 @@ bool TsHandler::endElement( const QString& /* namespaceURI */,
                              QStringList(), true,
                              MetaTranslatorMessage::Unfinished) );
             else
-                tor->insert( MetaTranslatorMessage(context.toAscii(),
+                tor->insert( MetaTranslatorMessage(context.toUtf8(),
                              ContextComment,
-                             accum.toAscii(), QString(), 0,
+                             accum.toUtf8(), QString(), 0,
                              QStringList(), false,
                              MetaTranslatorMessage::Unfinished) );
         }
@@ -182,8 +182,8 @@ bool TsHandler::endElement( const QString& /* namespaceURI */,
                                                comment.toUtf8(), m_fileName, m_lineNumber,
                                                translations, true, type, m_isPlural) );
         else
-            tor->insert( MetaTranslatorMessage(context.toAscii(), source.toAscii(),
-                                               comment.toAscii(), m_fileName, m_lineNumber,
+            tor->insert( MetaTranslatorMessage(context.toUtf8(), source.toUtf8(),
+                                               comment.toUtf8(), m_fileName, m_lineNumber,
                                                translations, false, type, m_isPlural) );
         inMessage = false;
     }

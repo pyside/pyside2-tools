@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 project(pyside-tools)
 
-find_package(Shiboken 1.1.1 REQUIRED)
-find_package(Qt4 4.5.0 REQUIRED)
-find_package(PySide 1.0.6 REQUIRED)
+find_package(Shiboken 2.0.0 REQUIRED)
+find_package(Qt5 REQUIRED Core)
+find_package(PySide 1.1.0 REQUIRED)
 
-set(pyside_tools_MAJOR_VERSION "0")
-set(pyside_tools_MINOR_VERSION "2")
-set(pyside_tools_MICRO_VERSION "15")
+set(pyside_tools_MAJOR_VERSION "2")
+set(pyside_tools_MINOR_VERSION "0")
+set(pyside_tools_MICRO_VERSION "0")
 set(pyside_tools_VERSION "${pyside_tools_MAJOR_VERSION}.${pyside_tools_MINOR_VERSION}.${pyside_tools_MICRO_VERSION}")
 
 configure_file("pysideuic/__init__.py.in" "__init__.py" @ONLY)

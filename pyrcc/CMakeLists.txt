@@ -1,14 +1,13 @@
+find_package(Qt5Xml)
 
 add_executable(pyside-rcc main.cpp rcc.cpp)
 include_directories(pyside-rcc
-                    ${QT_INCLUDE_DIR}
-                    ${QT_QT_INCLUDE_DIR}
-                    ${QT_QTXML_INCLUDE_DIR}
-                    ${QT_QTCORE_INCLUDE_DIR})
+                    ${Qt5Xml_INCLUDE_DIRS}
+                    ${Qt5Core_INCLUDE_DIRS})
 
 target_link_libraries(pyside-rcc
-                      ${QT_QTCORE_LIBRARY}
-                      ${QT_QTXML_LIBRARY})
+                      ${Qt5Core_LIBRARIES}
+                      ${Qt5Xml_LIBRARIES})
 
 install(TARGETS pyside-rcc RUNTIME DESTINATION bin)
 

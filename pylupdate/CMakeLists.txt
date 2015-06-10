@@ -11,22 +11,29 @@ simtexth.cpp
 translator.cpp
 )
 
+find_package(Qt5Core)
+find_package(Qt5Gui)
+find_package(Qt5Xml)
+find_package(Qt5Widgets)
+
 set(lupdate_MOC_HEADERS translator.h)
-qt4_wrap_cpp(lupdate_MOC_OUTFILES ${lupdate_MOC_HEADERS})
+qt5_wrap_cpp(lupdate_MOC_OUTFILES ${lupdate_MOC_HEADERS})
 
 add_executable(pyside-lupdate ${lupdate_SRC} ${lupdate_MOC_OUTFILES})
 include_directories(pyside-lupdate
                     ${CMAKE_CURRENT_SOURCE_DIR}
-                    ${QT_INCLUDE_DIR}
-                    ${QT_QT_INCLUDE_DIR}
-                    ${QT_QTXML_INCLUDE_DIR}
-                    ${QT_QTCORE_INCLUDE_DIR}
-                    ${QT_QTGUI_INCLUDE_DIR})
+                    ${Qt5Xml_INCLUDE_DIRS}
+                    ${Qt5Core_INCLUDE_DIRS}
+                    ${Qt5Gui_INCLUDE_DIRS}
+                    ${Qt5Widgets_INCLUDE_DIRS}
+                    )
 
 target_link_libraries(pyside-lupdate
-                      ${QT_QTCORE_LIBRARY}
-                      ${QT_QTXML_LIBRARY}
-                      ${QT_QTGUI_LIBRARY})
+                      ${Qt5Core_LIBRARIES}
+                      ${Qt5Xml_LIBRARIES}
+                      ${Qt5Gui_LIBRARIES}
+                      ${Qt5Widgets_LIBRARIES}
+                      )
 
 install(TARGETS pyside-lupdate RUNTIME DESTINATION bin)
 

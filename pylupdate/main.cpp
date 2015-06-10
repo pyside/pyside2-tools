@@ -185,7 +185,7 @@ int main( int argc, char **argv )
 
                 for ( t = toks.begin(); t != toks.end(); ++t ) {
                     if ( it.key() == "SOURCES" ) {
-                        fetchtr_py( (*t).toAscii(), &fetchedTor, defaultContext.toAscii(), true, codecForSource );
+                        fetchtr_py( (*t).toUtf8(), &fetchedTor, defaultContext.toUtf8(), true, codecForSource );
                         metSomething = true;
                     } else if ( it.key() == "TRANSLATIONS" ) {
                         tsFileNames.append( *t );
@@ -198,7 +198,7 @@ int main( int argc, char **argv )
                     } else if ( it.key() == "CODECFORSRC" ) {
                         codecForSource = (*t).toLatin1();
                     } else if ( it.key() == "FORMS" ) {
-                fetchtr_ui( (*t).toAscii(), &fetchedTor, defaultContext.toAscii(), true);
+                fetchtr_ui( (*t).toUtf8(), &fetchedTor, defaultContext.toUtf8(), true);
             }
                 }
             }
@@ -236,9 +236,9 @@ int main( int argc, char **argv )
             } else {
                 QFileInfo fi(argv[i]);
         if ( fi.suffix() == "py" || fi.suffix() == "pyw" ) {
-            fetchtr_py( fi.fileName().toAscii(), &fetchedTor, defaultContext.toAscii(), true, codecForSource );
+            fetchtr_py( fi.fileName().toUtf8(), &fetchedTor, defaultContext.toUtf8(), true, codecForSource );
         } else {
-            fetchtr_ui( fi.fileName().toAscii(), &fetchedTor, defaultContext.toAscii(), true);
+            fetchtr_ui( fi.fileName().toUtf8(), &fetchedTor, defaultContext.toUtf8(), true);
         }
             }
         }
