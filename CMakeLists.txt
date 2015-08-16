@@ -3,7 +3,7 @@ project(pyside-tools)
 
 find_package(Shiboken 2.0.0 REQUIRED)
 find_package(Qt5 REQUIRED Core)
-find_package(PySide 1.1.0 REQUIRED)
+find_package(PySide 2.0.0 REQUIRED)
 
 set(pyside_tools_MAJOR_VERSION "2")
 set(pyside_tools_MINOR_VERSION "0")
@@ -17,9 +17,11 @@ option(BUILD_TESTS "Build tests." TRUE)
 # UIC stuff
 if (NOT SITE_PACKAGE)
     execute_process(
-        COMMAND ${SHIBOKEN_PYTHON_INTERPRETER} -c "from __future__ import print_function; \\
-            from distutils import sysconfig; \\
-            print(sysconfig.get_python_lib(1,0,prefix='${CMAKE_INSTALL_PREFIX}'))"
+        COMMAND ${SHIBOKEN_PYTHON_INTERPRETER} -c "if True:
+            from distutils import sysconfig
+            from os.path import sep
+            print(sysconfig.get_python_lib(1, 0, prefix='${CMAKE_INSTALL_PREFIX}').replace(sep, '/'))
+            "
         OUTPUT_VARIABLE SITE_PACKAGE
     OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (NOT SITE_PACKAGE)
