@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 project(pyside2-tools)
 
-find_package(Shiboken 2.0.0 REQUIRED)
+find_package(Shiboken2 2.0.0 REQUIRED)
 find_package(Qt5 REQUIRED Core)
-find_package(PySide 2.0.0 REQUIRED)
+find_package(PySide2 2.0.0 REQUIRED)
 
 set(pyside_tools_MAJOR_VERSION "2")
 set(pyside_tools_MINOR_VERSION "0")
