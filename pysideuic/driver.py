@@ -66,8 +66,8 @@ class Driver(object):
         the parent process.
         """
 
-        from PySide import QtUiTools
-        from PySide import QtGui
+        from PySide2 import QtUiTools
+        from PySide2 import QtGui
 
         app = QtGui.QApplication([self._ui_file])
         widget = QtUiTools.QUiLoader().load(self._ui_file)
@@ -119,7 +119,7 @@ class Driver(object):
 
             traceback.print_exception(*sys.exc_info())
         else:
-            from PySide import QtCore
+            from PySide2 import QtCore
 
             sys.stderr.write("""An unexpected error occurred.
 Check that you are using the latest version of PySide and report the error to

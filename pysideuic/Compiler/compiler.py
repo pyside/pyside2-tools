@@ -47,7 +47,7 @@ class UICompiler(UIParser):
         indenter = getIndenter()
         indenter.level = 0
 
-        indenter.write("from PySide import QtCore, QtGui")
+        indenter.write("from PySide2 import QtCore, QtGui")
         indenter.write("")
 
         indenter.write("class Ui_%s(object):" % self.uiname)

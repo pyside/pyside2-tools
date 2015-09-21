@@ -403,7 +403,7 @@ RCCResourceLibrary::writeHeader(FILE *out)
     fprintf(out, "#\n");
     fprintf(out, "# WARNING! All changes made in this file will be lost!\n");
     fprintf(out, "\n");
-    fprintf(out, "from PySide import QtCore\n\n");
+    fprintf(out, "from PySide2 import QtCore\n\n");
 
     return true;
 }

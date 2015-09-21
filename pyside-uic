@@ -24,9 +24,9 @@
 import sys
 import optparse
 
-from PySide import QtCore
+from PySide2 import QtCore
 from pysideuic.driver import Driver
-from PySide import __version__ as PySideVersion
+from PySide2 import __version__ as PySideVersion
 from pysideuic import __version__ as PySideUicVersion
 
 Version = "PySide User Interface Compiler version %s, running on PySide %s." % (PySideUicVersion, PySideVersion)
