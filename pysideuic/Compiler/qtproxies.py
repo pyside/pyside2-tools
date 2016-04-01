@@ -71,7 +71,7 @@ class i18n_string(object):
         else:
             disambig = as_string(self.disambig, encode=False)
 
-        return 'QtGui.QApplication.translate("%s", %s, %s, QtGui.QApplication.UnicodeUTF8)' % (i18n_context, as_string(self.string, encode=False), disambig)
+        return 'QtWidgets.QApplication.translate("%s", %s, %s, -1)' % (i18n_context, as_string(self.string, encode=False), disambig)
 
 
 # Classes with this flag will be handled as literal values. If functions are
@@ -209,17 +209,7 @@ class QtCore(ProxyNamespace):
             ProxyClassMember(cls, "connect", 0)(*args)
         connect = classmethod(connect)
 
-# These sub-class QWidget but aren't themselves sub-classed.
-_qwidgets = ("QCalendarWidget", "QDialogButtonBox", "QDockWidget", "QGroupBox",
-        "QLineEdit", "QMainWindow", "QMenuBar", "QProgressBar", "QStatusBar",
-        "QToolBar", "QWizardPage")
-
 class QtGui(ProxyNamespace):
-    class QApplication(QtCore.QObject):
-        def translate(uiname, text, disambig, encoding):
-            return i18n_string(text or "", disambig)
-        translate = staticmethod(translate)
-
     class QIcon(ProxyClass): pass
     class QConicalGradient(ProxyClass): pass
     class QLinearGradient(ProxyClass): pass
@@ -228,11 +218,23 @@ class QtGui(ProxyNamespace):
     class QPainter(ProxyClass): pass
     class QPalette(ProxyClass): pass
     class QFont(ProxyClass): pass
+
+# These sub-class QWidget but aren't themselves sub-classed.
+_qwidgets = ("QCalendarWidget", "QDialogButtonBox", "QDockWidget", "QGroupBox",
+             "QLineEdit", "QMainWindow", "QMenuBar", "QProgressBar", "QStatusBar",
+             "QToolBar", "QWizardPage")
+
+class QtWidgets(ProxyNamespace):
+    class QApplication(QtCore.QObject):
+        def translate(uiname, text, disambig, encoding):
+            return i18n_string(text or "", disambig)
+        translate = staticmethod(translate)
+
     class QSpacerItem(ProxyClass): pass
     class QSizePolicy(ProxyClass): pass
     ## QActions inherit from QObject for the metaobject stuff
     ## and the hierarchy has to be correct since we have a
-    ## isinstance(x, QtGui.QLayout) call in the ui parser
+    ## isinstance(x, QtWidgets.QLayout) call in the ui parser
     class QAction(QtCore.QObject): pass
     class QActionGroup(QtCore.QObject): pass
     class QButtonGroup(QtCore.QObject): pass
@@ -316,7 +318,7 @@ class QtGui(ProxyNamespace):
             return Literal("%s.indexOf(%s)" % (self, page))
 
         def layout(self):
-            return QtGui.QLayout("%s.layout()" % self,
+            return QtWidgets.QLayout("%s.layout()" % self,
                     False, (), noInstantiation=True)
 
     class QAbstractScrollArea(QFrame): pass
@@ -335,16 +337,16 @@ class QtGui(ProxyNamespace):
 
     class QTableView(QAbstractItemView):
         def horizontalHeader(self):
-            return QtGui.QHeaderView("%s.horizontalHeader()" % self,
+            return QtWidgets.QHeaderView("%s.horizontalHeader()" % self,
                     False, (), noInstantiation=True)
 
         def verticalHeader(self):
-            return QtGui.QHeaderView("%s.verticalHeader()" % self,
+            return QtWidgets.QHeaderView("%s.verticalHeader()" % self,
                     False, (), noInstantiation=True)
 
     class QTreeView(QAbstractItemView):
         def header(self):
-            return QtGui.QHeaderView("%s.header()" % self,
+            return QtWidgets.QHeaderView("%s.header()" % self,
                     False, (), noInstantiation=True)
 
     class QListWidgetItem(ProxyClass): pass
@@ -354,7 +356,7 @@ class QtGui(ProxyNamespace):
         setSortingEnabled = i18n_void_func("setSortingEnabled")
 
         def item(self, row):
-            return QtGui.QListWidgetItem("%s.item(%i)" % (self, row), False,
+            return QtWidgets.QListWidgetItem("%s.item(%i)" % (self, row), False,
                     (), noInstantiation=True)
 
     class QTableWidgetItem(ProxyClass): pass
@@ -364,20 +366,20 @@ class QtGui(ProxyNamespace):
         setSortingEnabled = i18n_void_func("setSortingEnabled")
 
         def item(self, row, col):
-            return QtGui.QTableWidgetItem("%s.item(%i, %i)" % (self, row, col),
+            return QtWidgets.QTableWidgetItem("%s.item(%i, %i)" % (self, row, col),
                     False, (), noInstantiation=True)
 
         def horizontalHeaderItem(self, col):
-            return QtGui.QTableWidgetItem("%s.horizontalHeaderItem(%i)" % (self, col),
+            return QtWidgets.QTableWidgetItem("%s.horizontalHeaderItem(%i)" % (self, col),
                     False, (), noInstantiation=True)
 
         def verticalHeaderItem(self, row):
-            return QtGui.QTableWidgetItem("%s.verticalHeaderItem(%i)" % (self, row),
+            return QtWidgets.QTableWidgetItem("%s.verticalHeaderItem(%i)" % (self, row),
                     False, (), noInstantiation=True)
 
     class QTreeWidgetItem(ProxyClass):
         def child(self, index):
-            return QtGui.QTreeWidgetItem("%s.child(%i)" % (self, index),
+            return QtWidgets.QTreeWidgetItem("%s.child(%i)" % (self, index),
                     False, (), noInstantiation=True)
 
     class QTreeWidget(QTreeView):
@@ -385,11 +387,11 @@ class QtGui(ProxyNamespace):
         setSortingEnabled = i18n_void_func("setSortingEnabled")
 
         def headerItem(self):
-            return QtGui.QWidget("%s.headerItem()" % self, False, (),
+            return QtWidgets.QWidget("%s.headerItem()" % self, False, (),
                     noInstantiation=True)
 
         def topLevelItem(self, index):
-            return QtGui.QTreeWidgetItem("%s.topLevelItem(%i)" % (self, index),
+            return QtWidgets.QTreeWidgetItem("%s.topLevelItem(%i)" % (self, index),
                     False, (), noInstantiation=True)
 
     class QAbstractButton(QWidget): pass

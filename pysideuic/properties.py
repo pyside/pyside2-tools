@@ -37,6 +37,7 @@ DEBUG = logger.debug
 
 QtCore = None
 QtGui = None
+QtWidgets = None
 
 
 def int_list(prop):
@@ -53,8 +54,9 @@ def needsWidget(func):
 
 
 class Properties(object):
-    def __init__(self, factory, QtCore_mod, QtGui_mod):
-        global QtGui, QtCore
+    def __init__(self, factory, QtCore_mod, QtGui_mod, QtWidgets_mod):
+        global QtGui, QtCore, QtWidgets
+        QtWidgets = QtWidgets_mod
         QtGui = QtGui_mod
         QtCore = QtCore_mod
         self.factory = factory
@@ -125,8 +127,8 @@ class Properties(object):
         if prop.get('notr', notr) == 'true':
             return text
 
-        return QtGui.QApplication.translate(self.uiname, text,
-                prop.get('comment'), QtGui.QApplication.UnicodeUTF8)
+        return QtWidgets.QApplication.translate(self.uiname, text,
+                prop.get('comment'), -1)
 
     _char = _string
 
@@ -297,12 +299,12 @@ class Properties(object):
         if len(values) == 2:
             # Qt v4.3.0 and later.
             horstretch, verstretch = values
-            hsizetype = getattr(QtGui.QSizePolicy, prop.get('hsizetype'))
-            vsizetype = getattr(QtGui.QSizePolicy, prop.get('vsizetype'))
+            hsizetype = getattr(QtWidgets.QSizePolicy, prop.get('hsizetype'))
+            vsizetype = getattr(QtWidgets.QSizePolicy, prop.get('vsizetype'))
         else:
             hsizetype, vsizetype, horstretch, verstretch = values
-            hsizetype = QtGui.QSizePolicy.Policy(hsizetype)
-            vsizetype = QtGui.QSizePolicy.Policy(vsizetype)
+            hsizetype = QtWidgets.QSizePolicy.Policy(hsizetype)
+            vsizetype = QtWidgets.QSizePolicy.Policy(vsizetype)
 
         sizePolicy = self.factory.createQObject("QSizePolicy", "sizePolicy",
                 (hsizetype, vsizetype), is_attribute=False)
@@ -452,13 +454,13 @@ class Properties(object):
         # If the class is a QFrame, it's a line.
         if widget.metaObject().className() == "QFrame":
             widget.setFrameShape(
-                {"Qt::Horizontal": QtGui.QFrame.HLine,
-                 "Qt::Vertical"  : QtGui.QFrame.VLine}[prop[0].text])
+                {"Qt::Horizontal": QtWidgets.QFrame.HLine,
+                 "Qt::Vertical"  : QtWidgets.QFrame.VLine}[prop[0].text])
 
             # In Qt Designer, lines appear to be sunken, QFormBuilder loads
             # them as such, uic generates plain lines.  We stick to the look in
             # Qt Designer.
-            widget.setFrameShadow(QtGui.QFrame.Sunken)
+            widget.setFrameShadow(QtWidgets.QFrame.Sunken)
         else:
             widget.setOrientation(self._enum(prop[0]))
 

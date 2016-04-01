@@ -40,8 +40,8 @@ _header = """# -*- coding: utf-8 -*-
 _display_code = """
 if __name__ == "__main__":
 \timport sys
-\tapp = QtGui.QApplication(sys.argv)
-\t%(widgetname)s = QtGui.%(baseclass)s()
+\tapp = QtWidgets.QApplication(sys.argv)
+\t%(widgetname)s = QtWidgets.%(baseclass)s()
 \tui = %(uiclass)s()
 \tui.setupUi(%(widgetname)s)
 \t%(widgetname)s.show()
@@ -127,7 +127,7 @@ def compileUi(uifile, pyfile, execute=False, indent=4, from_imports=False):
     """
 
     from time import ctime
-    import PySide
+    import PySide2
 
     try:
         uifname = uifile.name
@@ -137,7 +137,7 @@ def compileUi(uifile, pyfile, execute=False, indent=4, from_imports=False):
     indenter.indentwidth = indent
 
     global PySideToolsVersion
-    pyfile.write(_header % (uifname, ctime(), __version__, PySide.__version__))
+    pyfile.write(_header % (uifname, ctime(), __version__, PySide2.__version__))
 
     winfo = compiler.UICompiler().compileUi(uifile, pyfile, from_imports)
 
