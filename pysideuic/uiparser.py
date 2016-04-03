@@ -46,6 +46,7 @@ if sys.version_info < (2,4,0):
 
 QtCore = None
 QtGui = None
+QtWidgets = None
 
 
 def gridPosition(elem):
@@ -69,7 +70,7 @@ class WidgetStack(list):
         DEBUG("push %s %s" % (item.metaObject().className(),
                               item.objectName()))
         self.append(item)
-        if isinstance(item, QtGui.QWidget):
+        if isinstance(item, QtWidgets.QWidget):
             self.topwidget = item
 
     def popLayout(self):
@@ -83,7 +84,7 @@ class WidgetStack(list):
         DEBUG("pop widget %s %s" % (widget.metaObject().className(),
                                     widget.objectName()))
         for item in reversed(self):
-            if isinstance(item, QtGui.QWidget):
+            if isinstance(item, QtWidgets.QWidget):
                 self.topwidget = item
                 break
         else:
@@ -95,17 +96,18 @@ class WidgetStack(list):
         return self[-1]
 
     def topIsLayout(self):
-        return isinstance(self[-1], QtGui.QLayout)
+        return isinstance(self[-1], QtWidgets.QLayout)
 
 
 class UIParser(object):
-    def __init__(self, QtCoreModule, QtGuiModule, creatorPolicy):
+    def __init__(self, QtCoreModule, QtGuiModule, QtWidgetsModule, creatorPolicy):
         self.factory = QObjectCreator(creatorPolicy)
-        self.wprops = Properties(self.factory, QtCoreModule, QtGuiModule)
+        self.wprops = Properties(self.factory, QtCoreModule, QtGuiModule, QtWidgetsModule)
 
-        global QtCore, QtGui
+        global QtCore, QtGui, QtWidgets
         QtCore = QtCoreModule
         QtGui = QtGuiModule
+        QtWidgets = QtWidgetsModule
 
         self.reset()
 
@@ -113,7 +115,7 @@ class UIParser(object):
         """UIParser.uniqueName(string) -> string
 
         Create a unique name from a string.
-        >>> p = UIParser(QtCore, QtGui)
+        >>> p = UIParser(QtCore, QtGui, QtWidgets)
         >>> p.uniqueName("foo")
         'foo'
         >>> p.uniqueName("foo")
@@ -173,22 +175,22 @@ class UIParser(object):
         # if is a Menubar on MacOS
         macMenu = (sys.platform == 'darwin') and (widget_class == 'QMenuBar')
 
-        if isinstance(parent, (QtGui.QDockWidget, QtGui.QMdiArea,
-                               QtGui.QScrollArea, QtGui.QStackedWidget,
-                               QtGui.QToolBox, QtGui.QTabWidget,
-                               QtGui.QWizard)) or macMenu:
+        if isinstance(parent, (QtWidgets.QDockWidget, QtWidgets.QMdiArea,
+                               QtWidgets.QScrollArea, QtWidgets.QStackedWidget,
+                               QtWidgets.QToolBox, QtWidgets.QTabWidget,
+                               QtWidgets.QWizard)) or macMenu:
             parent = None
 
 
         # See if this is a layout widget.
         if widget_class == 'QWidget':
             if parent is not None:
-                if not isinstance(parent, QtGui.QMainWindow):
+                if not isinstance(parent, QtWidgets.QMainWindow):
                     self.layout_widget = True
 
         self.stack.push(self.setupObject(widget_class, parent, elem))
 
-        if isinstance(self.stack.topwidget, QtGui.QTableWidget):
+        if isinstance(self.stack.topwidget, QtWidgets.QTableWidget):
             self.stack.topwidget.setColumnCount(len(elem.findall("column")))
             self.stack.topwidget.setRowCount(len(elem.findall("row")))
 
@@ -197,16 +199,16 @@ class UIParser(object):
 
         self.layout_widget = False
 
-        if isinstance(widget, QtGui.QTreeView):
+        if isinstance(widget, QtWidgets.QTreeView):
             self.handleHeaderView(elem, "header", widget.header())
 
-        elif isinstance(widget, QtGui.QTableView):
+        elif isinstance(widget, QtWidgets.QTableView):
             self.handleHeaderView(elem, "horizontalHeader",
                     widget.horizontalHeader())
             self.handleHeaderView(elem, "verticalHeader",
                     widget.verticalHeader())
 
-        elif isinstance(widget, QtGui.QAbstractButton):
+        elif isinstance(widget, QtWidgets.QAbstractButton):
             bg_i18n = self.wprops.getAttribute(elem, "buttonGroup")
             if bg_i18n is not None:
                 bg_name = bg_i18n.string
@@ -230,14 +232,14 @@ class UIParser(object):
             lay = self.stack.peek()
             gp = elem.attrib["grid-position"]
 
-            if isinstance(lay, QtGui.QFormLayout):
+            if isinstance(lay, QtWidgets.QFormLayout):
                 lay.setWidget(gp[0], self._form_layout_role(gp), widget)
             else:
                 lay.addWidget(widget, *gp)
 
         topwidget = self.stack.topwidget
 
-        if isinstance(topwidget, QtGui.QToolBox):
+        if isinstance(topwidget, QtWidgets.QToolBox):
             icon = self.wprops.getAttribute(elem, "icon")
             if icon is not None:
                 topwidget.addItem(widget, icon, self.wprops.getAttribute(elem, "label"))
@@ -248,7 +250,7 @@ class UIParser(object):
             if tooltip is not None:
                 topwidget.setItemToolTip(topwidget.indexOf(widget), tooltip)
 
-        elif isinstance(topwidget, QtGui.QTabWidget):
+        elif isinstance(topwidget, QtWidgets.QTabWidget):
             icon = self.wprops.getAttribute(elem, "icon")
             if icon is not None:
                 topwidget.addTab(widget, icon, self.wprops.getAttribute(elem, "title"))
@@ -259,19 +261,19 @@ class UIParser(object):
             if tooltip is not None:
                 topwidget.setTabToolTip(topwidget.indexOf(widget), tooltip)
 
-        elif isinstance(topwidget, QtGui.QWizard):
+        elif isinstance(topwidget, QtWidgets.QWizard):
             topwidget.addPage(widget)
 
-        elif isinstance(topwidget, QtGui.QStackedWidget):
+        elif isinstance(topwidget, QtWidgets.QStackedWidget):
             topwidget.addWidget(widget)
 
-        elif isinstance(topwidget, (QtGui.QDockWidget, QtGui.QScrollArea)):
+        elif isinstance(topwidget, (QtWidgets.QDockWidget, QtWidgets.QScrollArea)):
             topwidget.setWidget(widget)
 
-        elif isinstance(topwidget, QtGui.QMainWindow):
-            if type(widget) == QtGui.QWidget:
+        elif isinstance(topwidget, QtWidgets.QMainWindow):
+            if type(widget) == QtWidgets.QWidget:
                 topwidget.setCentralWidget(widget)
-            elif isinstance(widget, QtGui.QToolBar):
+            elif isinstance(widget, QtWidgets.QToolBar):
                 tbArea = self.wprops.getAttribute(elem, "toolBarArea")
 
                 if tbArea is None:
@@ -284,11 +286,11 @@ class UIParser(object):
                 if tbBreak:
                     topwidget.insertToolBarBreak(widget)
 
-            elif isinstance(widget, QtGui.QMenuBar):
+            elif isinstance(widget, QtWidgets.QMenuBar):
                 topwidget.setMenuBar(widget)
-            elif isinstance(widget, QtGui.QStatusBar):
+            elif isinstance(widget, QtWidgets.QStatusBar):
                 topwidget.setStatusBar(widget)
-            elif isinstance(widget, QtGui.QDockWidget):
+            elif isinstance(widget, QtWidgets.QDockWidget):
                 dwArea = self.wprops.getAttribute(elem, "dockWidgetArea")
                 topwidget.addDockWidget(QtCore.Qt.DockWidgetArea(dwArea),
                         widget)
@@ -332,9 +334,9 @@ class UIParser(object):
             size_args = (int(width), int(height))
 
         sizeType = self.wprops.getProperty(elem, "sizeType",
-                QtGui.QSizePolicy.Expanding)
+                QtWidgets.QSizePolicy.Expanding)
 
-        policy = (QtGui.QSizePolicy.Minimum, sizeType)
+        policy = (QtWidgets.QSizePolicy.Minimum, sizeType)
 
         if self.wprops.getProperty(elem, "orientation") == QtCore.Qt.Horizontal:
             policy = policy[1], policy[0]
@@ -347,7 +349,7 @@ class UIParser(object):
             lay = self.stack.peek()
             gp = elem.attrib["grid-position"]
 
-            if isinstance(lay, QtGui.QFormLayout):
+            if isinstance(lay, QtWidgets.QFormLayout):
                 lay.setItem(gp[0], self._form_layout_role(gp), spacer)
             else:
                 lay.addItem(spacer, *gp)
@@ -429,13 +431,13 @@ class UIParser(object):
             top_layout = self.stack.peek()
             gp = elem.attrib["grid-position"]
 
-            if isinstance(top_layout, QtGui.QFormLayout):
+            if isinstance(top_layout, QtWidgets.QFormLayout):
                 top_layout.setLayout(gp[0], self._form_layout_role(gp), layout)
             else:
                 top_layout.addLayout(layout, *gp)
 
     def configureLayout(self, elem, layout):
-        if isinstance(layout, QtGui.QGridLayout):
+        if isinstance(layout, QtWidgets.QGridLayout):
             self.setArray(elem, 'columnminimumwidth',
                     layout.setColumnMinimumWidth)
             self.setArray(elem, 'rowminimumheight',
@@ -443,7 +445,7 @@ class UIParser(object):
             self.setArray(elem, 'columnstretch', layout.setColumnStretch)
             self.setArray(elem, 'rowstretch', layout.setRowStretch)
 
-        elif isinstance(layout, QtGui.QBoxLayout):
+        elif isinstance(layout, QtWidgets.QBoxLayout):
             self.setArray(elem, 'stretch', layout.setStretch)
 
     def setArray(self, elem, name, setter):
@@ -461,7 +463,7 @@ class UIParser(object):
         else:
             w = self.stack.topwidget
 
-            if isinstance(w, QtGui.QComboBox):
+            if isinstance(w, QtWidgets.QComboBox):
                 text = self.wprops.getProperty(elem, "text")
                 icon = self.wprops.getProperty(elem, "icon")
 
@@ -472,7 +474,7 @@ class UIParser(object):
 
                 w.setItemText(self.item_nr, text)
 
-            elif isinstance(w, QtGui.QListWidget):
+            elif isinstance(w, QtWidgets.QListWidget):
                 text = self.wprops.getProperty(elem, "text")
                 icon = self.wprops.getProperty(elem, "icon")
                 flags = self.wprops.getProperty(elem, "flags")
@@ -510,7 +512,7 @@ class UIParser(object):
                 if foreground:
                     item.setForeground(foreground)
 
-            elif isinstance(w, QtGui.QTreeWidget):
+            elif isinstance(w, QtWidgets.QTreeWidget):
                 if self.itemstack:
                     parent, _ = self.itemstack[-1]
                     _, nr_in_root = self.itemstack[0]
@@ -557,7 +559,7 @@ class UIParser(object):
                 self.traverseWidgetTree(elem)
                 _, self.item_nr = self.itemstack.pop()
 
-            elif isinstance(w, QtGui.QTableWidget):
+            elif isinstance(w, QtWidgets.QTableWidget):
                 text = self.wprops.getProperty(elem, "text")
                 icon = self.wprops.getProperty(elem, "icon")
                 flags = self.wprops.getProperty(elem, "flags")
@@ -606,7 +608,7 @@ class UIParser(object):
     def addHeader(self, elem):
         w = self.stack.topwidget
 
-        if isinstance(w, QtGui.QTreeWidget):
+        if isinstance(w, QtWidgets.QTreeWidget):
             text = self.wprops.getProperty(elem, "text")
             icon = self.wprops.getProperty(elem, "icon")
 
@@ -618,7 +620,7 @@ class UIParser(object):
 
             self.column_counter += 1
 
-        elif isinstance(w, QtGui.QTableWidget):
+        elif isinstance(w, QtWidgets.QTableWidget):
             if len(elem) == 0:
                 return
 
@@ -720,9 +722,9 @@ class UIParser(object):
             else:
                 DEBUG("add action %s to %s", action_name, widget.objectName())
                 action_obj = getattr(self.toplevelWidget, action_name)
-                if isinstance(action_obj, QtGui.QMenu):
+                if isinstance(action_obj, QtWidgets.QMenu):
                     widget.addAction(action_obj.menuAction())
-                elif not isinstance(action_obj, QtGui.QActionGroup):
+                elif not isinstance(action_obj, QtWidgets.QActionGroup):
                     widget.addAction(action_obj)
 
     def setDelayedProps(self):
@@ -873,10 +875,10 @@ class UIParser(object):
     @staticmethod
     def _form_layout_role(grid_position):
         if grid_position[3] > 1:
-            role = QtGui.QFormLayout.SpanningRole
+            role = QtWidgets.QFormLayout.SpanningRole
         elif grid_position[1] == 1:
-            role = QtGui.QFormLayout.FieldRole
+            role = QtWidgets.QFormLayout.FieldRole
         else:
-            role = QtGui.QFormLayout.LabelRole
+            role = QtWidgets.QFormLayout.LabelRole
 
         return role

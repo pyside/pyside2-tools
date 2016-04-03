@@ -33,7 +33,7 @@ from pysideuic.Compiler.misc import write_import
 
 class UICompiler(UIParser):
     def __init__(self):
-        UIParser.__init__(self, qtproxies.QtCore, qtproxies.QtGui,
+        UIParser.__init__(self, qtproxies.QtCore, qtproxies.QtGui, qtproxies.QtWidgets,
                 CompilerCreatorPolicy())
 
     def reset(self):
@@ -47,7 +47,7 @@ class UICompiler(UIParser):
         indenter = getIndenter()
         indenter.level = 0
 
-        indenter.write("from PySide2 import QtCore, QtGui")
+        indenter.write("from PySide2 import QtCore, QtGui, QtWidgets")
         indenter.write("")
 
         indenter.write("class Ui_%s(object):" % self.uiname)

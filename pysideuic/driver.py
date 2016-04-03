@@ -68,8 +68,9 @@ class Driver(object):
 
         from PySide2 import QtUiTools
         from PySide2 import QtGui
+        from PySide2 import QtWidgets
 
-        app = QtGui.QApplication([self._ui_file])
+        app = QtWidgets.QApplication([self._ui_file])
         widget = QtUiTools.QUiLoader().load(self._ui_file)
         widget.show()
 

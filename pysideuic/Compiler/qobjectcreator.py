@@ -29,17 +29,17 @@ except NameError:
     from sets import Set as set
 
 from pysideuic.Compiler.indenter import write_code
-from pysideuic.Compiler.qtproxies import QtGui, Literal, strict_getattr
+from pysideuic.Compiler.qtproxies import QtWidgets, Literal, strict_getattr
 
 
 logger = logging.getLogger(__name__)
 DEBUG = logger.debug
 
 
-class _QtGuiWrapper(object):
+class _QtWidgetsWrapper(object):
     def search(clsname):
         try:
-            return strict_getattr(QtGui, clsname)
+            return strict_getattr(QtWidgets, clsname)
         except AttributeError:
             return None
 
@@ -62,7 +62,7 @@ class _ModuleWrapper(object):
     def search(self, cls):
         if cls in self._classes:
             self._used = True
-            return type(cls, (QtGui.QWidget,), {"module": self._module})
+            return type(cls, (QtWidgets.QWidget,), {"module": self._module})
         else:
             return None
 
@@ -87,7 +87,7 @@ class _CustomWidgetLoader(object):
     def _resolveBaseclass(self, baseClass):
         try:
             for x in range(0, 10):
-                try: return strict_getattr(QtGui, baseClass)
+                try: return strict_getattr(QtWidgets, baseClass)
                 except AttributeError: pass
 
                 baseClass = self._widgets[baseClass][0]
@@ -124,8 +124,8 @@ class CompilerCreatorPolicy(object):
     def __init__(self):
         self._modules = []
 
-    def createQtGuiWrapper(self):
-        return _QtGuiWrapper
+    def createQtWidgetsWrapper(self):
+        return _QtWidgetsWrapper
 
     def createModuleWrapper(self, name, classes):
         mw = _ModuleWrapper(name, classes)
