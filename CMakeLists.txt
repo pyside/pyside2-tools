@@ -37,7 +37,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/pyside2-uic
         WORLD_EXECUTE WORLD_READ)
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py"
-        DESTINATION "${SITE_PACKAGE}"/pyside2uic)
+        DESTINATION "${SITE_PACKAGE}/pyside2uic")
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pyside2uic
         DESTINATION ${SITE_PACKAGE}
         PATTERN "*.in" EXCLUDE
