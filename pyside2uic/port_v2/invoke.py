@@ -20,33 +20,29 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-
-from pysideuic.Compiler.indenter import write_code
-
-
-def write_import(module_name, from_imports):
-    if from_imports:
-        write_code("from . import %s" % module_name)
-    else:
-        write_code("import %s" % module_name)
+from pyside2uic.exceptions import NoSuchWidgetError
 
 
-def moduleMember(module, name):
-    if module:
-        return "%s.%s" % (module, name)
+def invoke(driver):
+    """ Invoke the given command line driver.  Return the exit status to be
+    passed back to the parent process.
+    """
 
-    return name
+    exit_status = 1
 
+    try:
+        exit_status = driver.invoke()
 
-class Literal(object):
-    """Literal(string) -> new literal
+    except IOError, e:
+        driver.on_IOError(e)
 
-    string will not be quoted when put into an argument list"""
-    def __init__(self, string):
-        self.string = string
+    except SyntaxError, e:
+        driver.on_SyntaxError(e)
 
-    def __str__(self):
-        return self.string
+    except NoSuchWidgetError, e:
+        driver.on_NoSuchWidgetError(e)
 
-    def __or__(self, r_op):
-        return Literal("%s|%s" % (self, r_op))
+    except Exception, e:
+        driver.on_Exception(e)
+
+    return exit_status

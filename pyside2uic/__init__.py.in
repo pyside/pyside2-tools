@@ -24,14 +24,14 @@ __all__ = ("compileUi", "compileUiDir", "widgetPluginPath")
 
 __version__ = "@pyside_tools_VERSION@"
 
-from pysideuic.Compiler import indenter, compiler
+from pyside2uic.Compiler import indenter, compiler
 
 _header = """# -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file '%s'
 #
 # Created: %s
-#      by: pyside-uic %s running on PySide %s
+#      by: pyside2-uic %s running on PySide2 %s
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -146,4 +146,4 @@ def compileUi(uifile, pyfile, execute=False, indent=4, from_imports=False):
 
 
 # The list of directories that are searched for widget plugins.
-from pysideuic.objcreator import widgetPluginPath
+from pyside2uic.objcreator import widgetPluginPath

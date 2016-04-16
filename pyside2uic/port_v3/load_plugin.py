@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-from pysideuic.exceptions import WidgetPluginError
+from pyside2uic.exceptions import WidgetPluginError
 
 
 def load_plugin(plugin, plugin_globals, plugin_locals):
@@ -33,7 +33,7 @@ def load_plugin(plugin, plugin_globals, plugin_locals):
         exec(plugin.read(), plugin_globals, plugin_locals)
     except ImportError:
         return False
-    except Exception, e:
+    except Exception as e:
         raise WidgetPluginError("%s: %s" % (e.__class__, str(e)))
 
     return True

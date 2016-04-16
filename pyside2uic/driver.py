@@ -24,7 +24,7 @@
 import sys
 import logging
 
-from pysideuic import compileUi
+from pyside2uic import compileUi
 
 
 class Driver(object):
@@ -32,7 +32,7 @@ class Driver(object):
     called by code that is Python v2/v3 specific.
     """
 
-    LOGGER_NAME = 'PySide.uic'
+    LOGGER_NAME = 'PySide2.uic'
 
     def __init__(self, opts, ui_file):
         """ Initialise the object.  opts is the parsed options.  ui_file is the
@@ -108,7 +108,7 @@ class Driver(object):
         """ Handle a NoSuchWidgetError exception. """
 
         if e.args[0].startswith("Q3"):
-            sys.stderr.write("Error: Q3Support widgets are not supported by PySide.\n")
+            sys.stderr.write("Error: Q3Support widgets are not supported by PySide2.\n")
         else:
             sys.stderr.write(str(e) + "\n")
 
@@ -123,6 +123,6 @@ class Driver(object):
             from PySide2 import QtCore
 
             sys.stderr.write("""An unexpected error occurred.
-Check that you are using the latest version of PySide and report the error to
+Check that you are using the latest version of PySide2 and report the error to
 http://bugs.openbossa.org, including the ui file used to trigger the error.
 """)

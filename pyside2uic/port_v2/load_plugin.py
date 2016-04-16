@@ -20,29 +20,20 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-from pysideuic.exceptions import NoSuchWidgetError
+from pyside2uic.exceptions import WidgetPluginError
 
 
-def invoke(driver):
-    """ Invoke the given command line driver.  Return the exit status to be
-    passed back to the parent process.
+def load_plugin(plugin, plugin_globals, plugin_locals):
+    """ Load the given plugin (which is an open file).  Return True if the
+    plugin was loaded, or False if it wanted to be ignored.  Raise an exception
+    if there was an error.
     """
 
-    exit_status = 1
-
     try:
-        exit_status = driver.invoke()
+        exec(plugin.read(), plugin_globals, plugin_locals)
+    except ImportError:
+        return False
+    except Exception, e:
+        raise WidgetPluginError("%s: %s" % (e.__class__, str(e)))
 
-    except IOError as e:
-        driver.on_IOError(e)
-
-    except SyntaxError as e:
-        driver.on_SyntaxError(e)
-
-    except NoSuchWidgetError as e:
-        driver.on_NoSuchWidgetError(e)
-
-    except Exception as e:
-        driver.on_Exception(e)
-
-    return exit_status
+    return True
