@@ -1,6 +1,6 @@
 import os
 import unittest
-from PySide.QtCore import QFile
+from PySide2.QtCore import QFile
 import example_rc
 
 class TestRccSimple(unittest.TestCase):

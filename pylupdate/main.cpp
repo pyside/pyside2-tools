@@ -54,8 +54,8 @@ typedef QList<MetaTranslatorMessage> TML;
 static void printUsage()
 {
     fprintf( stderr, "Usage:\n"
-             "    pyside-lupdate [options] project-file\n"
-             "    pyside-lupdate [options] source-files -ts ts-files\n"
+             "    pyside2-lupdate [options] project-file\n"
+             "    pyside2-lupdate [options] source-files -ts ts-files\n"
              "Options:\n"
              "    -help  Display this information and exit\n"
              "    -noobsolete\n"
@@ -63,7 +63,7 @@ static void printUsage()
              "    -verbose\n"
              "           Explain what is being done\n"
              "    -version\n"
-             "           Display the version of pyside-lupdate and exit\n" );
+             "           Display the version of pyside2-lupdate and exit\n" );
 }
 
 static void updateTsFiles( const MetaTranslator& fetchedTor,
@@ -90,10 +90,10 @@ static void updateTsFiles( const MetaTranslator& fetchedTor,
 #if defined(_MSC_VER) && _MSC_VER >= 1400
             char buf[100];
             strerror_s(buf, sizeof(buf), errno);
-            fprintf( stderr, "pyside-lupdate error: Cannot save '%s': %s\n",
+            fprintf( stderr, "pyside2-lupdate error: Cannot save '%s': %s\n",
                      fn.toLatin1().constData(), buf );
 #else
-            fprintf( stderr, "pyside-lupdate error: Cannot save '%s': %s\n",
+            fprintf( stderr, "pyside2-lupdate error: Cannot save '%s': %s\n",
                      fn.toLatin1().constData(), strerror(errno) );
 #endif
         }
@@ -135,7 +135,7 @@ int main( int argc, char **argv )
             verbose = true;
             continue;
         } else if ( qstrcmp(argv[i], "-version") == 0 ) {
-            fprintf( stderr, "pyside-lupdate version %s\n", QT_VERSION_STR );
+            fprintf( stderr, "pyside2-lupdate version %s\n", QT_VERSION_STR );
             return 0;
         } else if ( qstrcmp(argv[i], "-ts") == 0 ) {
             metTsFlag = true;
@@ -152,10 +152,10 @@ int main( int argc, char **argv )
 #if defined(_MSC_VER) && _MSC_VER >= 1400
                 char buf[100];
                 strerror_s(buf, sizeof(buf), errno);
-                fprintf( stderr, "pyside-lupdate error: Cannot open file '%s': %s\n",
+                fprintf( stderr, "pyside2-lupdate error: Cannot open file '%s': %s\n",
                          argv[i], buf );
 #else
-                fprintf( stderr, "pyside-lupdate error: Cannot open file '%s': %s\n",
+                fprintf( stderr, "pyside2-lupdate error: Cannot open file '%s': %s\n",
                          argv[i], strerror(errno) );
 #endif
                 return 1;
@@ -207,12 +207,12 @@ int main( int argc, char **argv )
 
             if ( !metSomething ) {
                 fprintf( stderr,
-                         "pyside-lupdate warning: File '%s' does not look like a"
+                         "pyside2-lupdate warning: File '%s' does not look like a"
                          " project file\n",
                          argv[i] );
             } else if ( tsFileNames.isEmpty() ) {
                 fprintf( stderr,
-                         "pyside-lupdate warning: Met no 'TRANSLATIONS' entry in"
+                         "pyside2-lupdate warning: Met no 'TRANSLATIONS' entry in"
                          " project file '%s'\n",
                          argv[i] );
             }
@@ -224,13 +224,13 @@ int main( int argc, char **argv )
                         tsFileNames.append( argv[i] );
                     } else {
                         fprintf( stderr,
-                                 "pyside-lupdate warning: For some reason, I cannot"
+                                 "pyside2-lupdate warning: For some reason, I cannot"
                                  " save '%s'\n",
                                  argv[i] );
                     }
         } else {
                     fprintf( stderr,
-                             "pyside-lupdate error: File '%s' lacks .ts extension\n",
+                             "pyside2-lupdate error: File '%s' lacks .ts extension\n",
                              argv[i] );
                 }
             } else {

@@ -25,19 +25,19 @@ import sys
 import optparse
 
 from PySide2 import QtCore
-from pysideuic.driver import Driver
+from pyside2uic.driver import Driver
 from PySide2 import __version__ as PySideVersion
-from pysideuic import __version__ as PySideUicVersion
+from pyside2uic import __version__ as PySideUicVersion
 
-Version = "PySide User Interface Compiler version %s, running on PySide %s." % (PySideUicVersion, PySideVersion)
+Version = "PySide2 User Interface Compiler version %s, running on PySide2 %s." % (PySideUicVersion, PySideVersion)
 
 def main():
     if sys.hexversion >= 0x03000000:
-        from pysideuic.port_v3.invoke import invoke
+        from pyside2uic.port_v3.invoke import invoke
     else:
-        from pysideuic.port_v2.invoke import invoke
+        from pyside2uic.port_v2.invoke import invoke
 
-    parser = optparse.OptionParser(usage="pyside-uic [options] <ui-file>",
+    parser = optparse.OptionParser(usage="pyside2-uic [options] <ui-file>",
             version=Version)
     parser.add_option("-p", "--preview", dest="preview", action="store_true",
             default=False,

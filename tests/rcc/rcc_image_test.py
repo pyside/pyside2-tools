@@ -1,7 +1,8 @@
 
 import unittest
 
-from PySide.QtGui import QApplication, QPixmap
+from PySide2.QtWidgets import QApplication
+from PySide2.QtGui import QPixmap
 
 import image_rc
 

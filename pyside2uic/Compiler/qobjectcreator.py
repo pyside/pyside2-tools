@@ -28,8 +28,8 @@ try:
 except NameError:
     from sets import Set as set
 
-from pysideuic.Compiler.indenter import write_code
-from pysideuic.Compiler.qtproxies import QtWidgets, Literal, strict_getattr
+from pyside2uic.Compiler.indenter import write_code
+from pyside2uic.Compiler.qtproxies import QtWidgets, Literal, strict_getattr
 
 
 logger = logging.getLogger(__name__)

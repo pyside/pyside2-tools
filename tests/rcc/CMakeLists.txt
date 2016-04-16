@@ -1,4 +1,3 @@
-
 macro(ADD_RCC_TEST name pyfile qrcfile)
     add_test(${name} ${CMAKE_CURRENT_SOURCE_DIR}/run_test.sh
                      ${PYSIDERCC_EXECUTABLE}
@@ -9,4 +8,3 @@ endmacro()
 
 add_rcc_test(RccTest rcc_test.py example.qrc)
 add_rcc_test(RccImageTest rcc_image_test.py image.qrc)
-

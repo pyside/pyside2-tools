@@ -22,13 +22,13 @@
 
 import sys
 
-from pysideuic.properties import Properties
-from pysideuic.uiparser import UIParser
-from pysideuic.Compiler import qtproxies
-from pysideuic.Compiler.indenter import createCodeIndenter, getIndenter, \
+from pyside2uic.properties import Properties
+from pyside2uic.uiparser import UIParser
+from pyside2uic.Compiler import qtproxies
+from pyside2uic.Compiler.indenter import createCodeIndenter, getIndenter, \
         write_code
-from pysideuic.Compiler.qobjectcreator import CompilerCreatorPolicy
-from pysideuic.Compiler.misc import write_import
+from pyside2uic.Compiler.qobjectcreator import CompilerCreatorPolicy
+from pyside2uic.Compiler.misc import write_import
 
 
 class UICompiler(UIParser):

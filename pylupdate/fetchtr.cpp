@@ -478,7 +478,7 @@ static bool matchString( QByteArray *s )
 static bool matchEncoding( bool *utf8 )
 {
     // Remove any leading module paths.
-    if (yyTok == Tok_Ident && strcmp(yyIdent, "PySide") == 0)
+    if (yyTok == Tok_Ident && strcmp(yyIdent, "PySide2") == 0)
     {
     yyTok = getToken();
 
@@ -731,7 +731,7 @@ void fetchtr_py( const char *fileName, MetaTranslator *tor,
             char buf[100];
             strerror_s(buf, sizeof(buf), errno);
             fprintf( stderr,
-                     "pyside-lupdate error: Cannot open Python source file '%s': %s\n",
+                     "pyside2-lupdate error: Cannot open Python source file '%s': %s\n",
                      fileName, buf );
         }
 #else
@@ -739,7 +739,7 @@ void fetchtr_py( const char *fileName, MetaTranslator *tor,
     if ( yyInFile == 0 ) {
         if ( mustExist )
             fprintf( stderr,
-                     "pyside-lupdate error: Cannot open Python source file '%s': %s\n",
+                     "pyside2-lupdate error: Cannot open Python source file '%s': %s\n",
                      fileName, strerror(errno) );
 #endif
         return;
@@ -862,10 +862,10 @@ void fetchtr_ui( const char *fileName, MetaTranslator *tor,
 #if defined(_MSC_VER) && _MSC_VER >= 1400
             char buf[100];
             strerror_s(buf, sizeof(buf), errno);
-            fprintf( stderr, "pyside-lupdate error: cannot open UI file '%s': %s\n",
+            fprintf( stderr, "pyside2-lupdate error: cannot open UI file '%s': %s\n",
                      fileName, buf );
 #else
-            fprintf( stderr, "pyside-lupdate error: cannot open UI file '%s': %s\n",
+            fprintf( stderr, "pyside2-lupdate error: cannot open UI file '%s': %s\n",
                      fileName, strerror(errno) );
 #endif
         }

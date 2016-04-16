@@ -20,8 +20,29 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
-from pysideuic.Compiler.proxy_type import ProxyType
+from pyside2uic.exceptions import NoSuchWidgetError
 
 
-class ProxyBase(object):
-    __metaclass__ = ProxyType
+def invoke(driver):
+    """ Invoke the given command line driver.  Return the exit status to be
+    passed back to the parent process.
+    """
+
+    exit_status = 1
+
+    try:
+        exit_status = driver.invoke()
+
+    except IOError as e:
+        driver.on_IOError(e)
+
+    except SyntaxError as e:
+        driver.on_SyntaxError(e)
+
+    except NoSuchWidgetError as e:
+        driver.on_NoSuchWidgetError(e)
+
+    except Exception as e:
+        driver.on_Exception(e)
+
+    return exit_status
