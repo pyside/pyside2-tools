@@ -159,7 +159,7 @@ qint64 RCCFileInfo::writeDataName(FILE *out, qint64 offset)
     offset += 2;
 
     //write the hash
-    qt_rcc_write_number(out, qHash(name), 4);
+    qt_rcc_write_number(out, qt_hash(name), 4);
     fprintf(out, "\\\n");
     offset += 4;
 
@@ -478,7 +478,7 @@ RCCResourceLibrary::writeDataNames(FILE *out)
 
 static bool qt_rcc_compare_hash(const RCCFileInfo *left, const RCCFileInfo *right)
 {
-    return qHash(left->name) < qHash(right->name);
+    return qt_hash(left->name) < qt_hash(right->name);
 }
 
 bool
