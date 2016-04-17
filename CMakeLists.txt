@@ -10,7 +10,7 @@ set(pyside2_tools_MINOR_VERSION "0")
 set(pyside2_tools_MICRO_VERSION "0")
 set(pyside2_tools_VERSION "${pyside2_tools_MAJOR_VERSION}.${pyside2_tools_MINOR_VERSION}.${pyside2_tools_MICRO_VERSION}")
 
-configure_file("pyside2uic/__init__.py.in" "${CMAKE_CURRENT_BINARY_DIR}/__init__.py" @ONLY)
+configure_file("pyside2uic/__init__.py.in" "${CMAKE_CURRENT_BINARY_DIR}/pyside2uic/__init__.py" @ONLY)
 
 option(BUILD_TESTS "Build tests." TRUE)
 
@@ -36,7 +36,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/pyside2-uic
         GROUP_EXECUTE GROUP_READ
         WORLD_EXECUTE WORLD_READ)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/pyside2uic/__init__.py"
         DESTINATION "${SITE_PACKAGE}/pyside2uic")
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pyside2uic
         DESTINATION ${SITE_PACKAGE}
