@@ -10,7 +10,7 @@ set(pyside2_tools_MINOR_VERSION "0")
 set(pyside2_tools_MICRO_VERSION "0")
 set(pyside2_tools_VERSION "${pyside2_tools_MAJOR_VERSION}.${pyside2_tools_MINOR_VERSION}.${pyside2_tools_MICRO_VERSION}")
 
-configure_file("pyside2uic/__init__.py.in" "pyside2uic/__init__.py" @ONLY)
+configure_file("pyside2uic/__init__.py.in" "${CMAKE_CURRENT_BINARY_DIR}/__init__.py" @ONLY)
 
 option(BUILD_TESTS "Build tests." TRUE)
 
