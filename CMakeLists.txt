@@ -41,6 +41,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/pyside2uic/__init__.py"
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/pyside2uic
         DESTINATION ${SITE_PACKAGE}
         PATTERN "*.in" EXCLUDE
+        PATTERN "*pyside2uic/*.1" EXCLUDE
         PATTERN "*pyside2uic/__init__.py" EXCLUDE
         PATTERN "*pyside2uic\\__init__.py" EXCLUDE)
 
