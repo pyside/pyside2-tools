@@ -29,11 +29,22 @@ except NameError:
     from sets import Set as set
 
 from pyside2uic.Compiler.indenter import write_code
-from pyside2uic.Compiler.qtproxies import QtWidgets, Literal, strict_getattr
+from pyside2uic.Compiler.qtproxies import (QtWidgets, QtGui, Literal,
+                                           strict_getattr)
 
 
 logger = logging.getLogger(__name__)
 DEBUG = logger.debug
+
+
+class _QtGuiWrapper(object):
+    def search(clsname):
+        try:
+            return strict_getattr(QtGui, clsname)
+        except AttributeError:
+            return None
+
+    search = staticmethod(search)
 
 
 class _QtWidgetsWrapper(object):
@@ -123,6 +134,9 @@ class _CustomWidgetLoader(object):
 class CompilerCreatorPolicy(object):
     def __init__(self):
         self._modules = []
+
+    def createQtGuiWrapper(self):
+        return _QtGuiWrapper
 
     def createQtWidgetsWrapper(self):
         return _QtWidgetsWrapper

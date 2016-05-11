@@ -47,7 +47,8 @@ class QObjectCreator(object):
         self._cpolicy = creatorPolicy
 
         self._cwFilters = []
-        self._modules = [self._cpolicy.createQtWidgetsWrapper()]
+        self._modules = [self._cpolicy.createQtWidgetsWrapper(),
+                         self._cpolicy.createQtGuiWrapper()]
 
         # Get the optional plugins.
         for plugindir in widgetPluginPath:
