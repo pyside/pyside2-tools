@@ -14,6 +14,13 @@ configure_file("pyside2uic/__init__.py.in" "${CMAKE_CURRENT_BINARY_DIR}/pyside2u
 
 option(BUILD_TESTS "Build tests." TRUE)
 
+if(CMAKE_HOST_APPLE)
+    set(OSX_USE_LIBCPP "OFF" CACHE BOOL "Explicitly link the libc++ standard library (useful for osx deployment targets lower than 10.9.")
+    if(OSX_USE_LIBCPP)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    endif()
+endif()
+
 # UIC stuff
 if (NOT SITE_PACKAGE)
     execute_process(
