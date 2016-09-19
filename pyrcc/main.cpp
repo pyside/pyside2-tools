@@ -2,7 +2,7 @@
  * This file is part of the PySide Tools project.
  *
  * Copyright (C) 1992-2005 Trolltech AS. All rights reserved.
- * Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (C) 2016 The Qt Company Ltd.
  *
  * Contact: PySide team <pyside@openbossa.org>
  *
@@ -37,7 +37,7 @@
 // Some static globals
 static QString initName;
 static bool verbose = false;
-static int py_version = 2;
+static int py_version = 3;
 static int compressLevel = CONSTANT_COMPRESSLEVEL_DEFAULT;
 static int compressThreshold = CONSTANT_COMPRESSTHRESHOLD_DEFAULT;
 static QString resourceRoot;
@@ -97,8 +97,8 @@ int showHelp(const char *argv0, const QString &error)
     fprintf(stderr, "Usage: %s  [options] <inputs>\n\n"
             "Options:\n"
             "    -o file           Write output to file rather than stdout\n"
-            "    -py2              Generate code for any Python v2.x version (default)\n"
-            "    -py3              Generate code for any Python v3.x version\n"
+            "    -py2              Generate code for any Python v2.x version\n"
+            "    -py3              Generate code for any Python v3.x version (default)\n"
             "    -name name        Create an external initialization function with name\n"
             "    -threshold level  Threshold to consider compressing files\n"
             "    -compress level   Compress input files by level\n"
