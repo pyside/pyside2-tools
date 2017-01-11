@@ -33,7 +33,7 @@
 #include <qlocale.h>
 #include <qdir.h>
 
-class QTextCodec;
+QT_FORWARD_DECLARE_CLASS(QTextCodec)
 
 class MetaTranslatorMessage : public TranslatorMessage
 {

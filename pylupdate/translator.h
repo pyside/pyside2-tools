@@ -33,7 +33,6 @@
 #include <qtranslator.h>
 
 class TranslatorPrivate;
-template <typename T> class QList;
 
 class TranslatorMessage
 {
@@ -95,7 +94,10 @@ private:
                Tag_Hash, Tag_SourceText, Tag_Context, Tag_Comment,
                Tag_Obsolete1 };
 };
+
+QT_BEGIN_NAMESPACE
 Q_DECLARE_TYPEINFO(TranslatorMessage, Q_MOVABLE_TYPE);
+QT_END_NAMESPACE
 
 inline void TranslatorMessage::setTranslations(const QStringList &translations)
 { m_translations = translations; }
