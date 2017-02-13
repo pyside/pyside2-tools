@@ -29,4 +29,4 @@ pluginType = MODULE
 # "import A".  If "module" is "A[.B].C", the code generator will write
 # "from A[.B] import C".  Each entry in "widget_list" must be unique.
 def moduleInformation():
-    return "PySide.QtDeclarative", ("QDeclarativeView", )
+    return "PySide2.QtDeclarative", ("QDeclarativeView", )
