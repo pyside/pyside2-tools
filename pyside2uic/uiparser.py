@@ -397,9 +397,11 @@ class UIParser(object):
                 SubElement(cme, 'number').text = str(right)
                 SubElement(cme, 'number').text = str(bottom)
         elif self.layout_widget:
-            # The layout's of layout widgets have no margin.
-            me = SubElement(elem, 'property', name='margin')
-            SubElement(me, 'number').text = '0'
+            margin = self.wprops.getProperty(elem, 'margin', -1)
+            if margin < 0:
+                # The layouts of layout widgets have no margin.
+                me = SubElement(elem, 'property', name='margin')
+                SubElement(me, 'number').text = '0'
 
             # In case there are any nested layouts.
             self.layout_widget = False
