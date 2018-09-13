@@ -15,7 +15,7 @@ Resources:
     The PySide2 project
   * [Shiboken2](https://github.com/PySide/shiboken2)
     The Shiboken2 project
-  * [PySide2-tools](https://github.com/PySide/pyside2-examples)
+  * [PySide2-tools](https://github.com/PySide/pyside2-tools)
     The PySide2-tools project
   * [PySide2-examples](https://github.com/PySide/pyside2-examples)
     The PySide2 example scripts
