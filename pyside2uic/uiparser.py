@@ -211,7 +211,7 @@ class UIParser(object):
         elif isinstance(widget, QtWidgets.QAbstractButton):
             bg_i18n = self.wprops.getAttribute(elem, "buttonGroup")
             if bg_i18n is not None:
-                bg_name = bg_i18n.string
+                bg_name = bg_i18n
 
                 for bg in self.button_groups:
                     if bg.objectName() == bg_name:
